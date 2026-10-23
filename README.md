@@ -45,3 +45,5 @@ Thêm 30 bản thu (nguồn Wikimedia Commons, tên tác giả/nghệ sĩ và gi
 - Dòng Danube xanh – Johann Strauss II, CC0
 - Bài ca mùa xuân – Mendelssohn – ROSA Pianist, CC BY 3.0
 - Rondo vui tươi – Mozart – Eine kleine Nachtmusik, Public domain
+
+Giọng đọc truyện và bài tập thở (thư mục voice/): giọng tiếng Việt Hoài My (Microsoft), tạo sẵn thành file mp3.

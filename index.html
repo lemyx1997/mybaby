@@ -390,7 +390,8 @@ const GEN={
 
 function stop(){clearTimeout(autoNext);stopFns.forEach(f=>{try{f()}catch(e){}});stopFns=[];timers.forEach(clearInterval);timers=[];audioEl=null;
  if(out){const o=out;o.gain.linearRampToValueAtTime(0,ctx.currentTime+1);setTimeout(()=>o.disconnect(),1200)}out=null}
-function play(tr){init();ctx.resume();stop();cur=tr;if(recAudio&&!recAudio.paused){recAudio.pause();renderRecs()}out=ctx.createGain();out.gain.setValueAtTime(0,ctx.currentTime);
+function play(tr){init();ctx.resume();stop();cur=tr;if(recAudio&&!recAudio.paused){recAudio.pause();renderRecs()}
+ if(voiceAudio&&!voiceAudio.paused&&!bTimer){voiceAudio.pause();document.querySelectorAll("[data-read]").forEach(x=>{delete x.dataset.on;x.textContent="🔊 Nghe đọc"})}out=ctx.createGain();out.gain.setValueAtTime(0,ctx.currentTime);
  out.gain.linearRampToValueAtTime(1,ctx.currentTime+2);out.connect(master);GEN[tr.g.type](tr.g);
  // Bản tự tạo phát vô tận: ở chế độ phát tiếp/ngẫu nhiên thì chuyển bài sau 5 phút
  if(!tr.lic&&mode!=="one")autoNext=setTimeout(()=>step(1),5*60000);
@@ -500,35 +501,35 @@ $("recList").onclick=async e=>{const b=e.target.closest("button"),row=e.target.c
  if(recAudio)recAudio.pause();recAudio=new Audio(URL.createObjectURL(r.blob));recAudio.dataset.id=id;recAudio.volume=+$("vol").value;
  document.querySelectorAll("#recList [data-a=play]").forEach(x=>x.textContent="▶");b.textContent="⏸";recAudio.onended=()=>b.textContent="▶";recAudio.play();logStart=Date.now()};
 
-// ===== Giọng đọc tiếng Việt =====
-function speak(text,rate=.9){if(!("speechSynthesis" in window))return false;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);
- const v=speechSynthesis.getVoices().find(v=>/^vi/i.test(v.lang));if(v)u.voice=v;u.lang="vi-VN";u.rate=rate;speechSynthesis.speak(u);return true}
-if("speechSynthesis" in window)speechSynthesis.getVoices();
+// ===== Giọng đọc tiếng Việt: file thu sẵn (giọng Hoài My) để máy nào cũng đọc đúng =====
+let voiceAudio=null;
+function say(name){if(voiceAudio)voiceAudio.pause();voiceAudio=new Audio("voice/"+name+".mp3");voiceAudio.volume=+$("vol").value;voiceAudio.play().catch(()=>{});return voiceAudio}
 
 // ===== Bài tập thở =====
 let bTimer=null;
-function stopBreath(){clearTimeout(bTimer);bTimer=null;$("bStart").textContent="Bắt đầu";$("circle").textContent="Sẵn sàng";$("circle").style.transform="scale(1)";$("bLeft").textContent="";if("speechSynthesis" in window)speechSynthesis.cancel()}
+function stopBreath(){clearTimeout(bTimer);bTimer=null;$("bStart").textContent="Bắt đầu";$("circle").textContent="Sẵn sàng";$("circle").style.transform="scale(1)";$("bLeft").textContent="";if(voiceAudio)voiceAudio.pause()}
 $("bStart").onclick=()=>{if(bTimer){stopBreath();return}
  const pat=$("bPat").value.split(",").map(Number),end=Date.now()+ +$("bDur").value*60000,voice=$("bVoice").checked;
- const phases=pat.length===4?[["Hít vào",1.6],["Giữ hơi",1.6],["Thở ra",1],["Nghỉ",1]]:[["Hít vào",1.6],["Giữ hơi",1.6],["Thở ra",1]];
+ const phases=pat.length===4?[["Hít vào",1.6,"in"],["Giữ hơi",1.6,"hold"],["Thở ra",1,"out"],["Nghỉ",1,"rest"]]:[["Hít vào",1.6,"in"],["Giữ hơi",1.6,"hold"],["Thở ra",1,"out"]];
  let i=0;$("bStart").textContent="Dừng";
- const run=()=>{if(Date.now()>=end){stopBreath();$("circle").textContent="Hoàn thành 🌸";if(voice)speak("Mẹ làm tốt lắm. Hãy thả lỏng và cảm nhận bé nhé.");return}
+ const run=()=>{if(Date.now()>=end){stopBreath();$("circle").textContent="Hoàn thành 🌸";if(voice)say("breath-end");return}
   const k=i%phases.length,sec=pat[k];i++;if(!sec){run();return}
-  const [label,scale]=phases[k];$("circle").textContent=label;$("circle").style.transitionDuration=sec+"s";$("circle").style.transform=`scale(${scale})`;
-  if(voice)speak(label);$("bLeft").textContent="còn "+fmt((end-Date.now())/1000);bTimer=setTimeout(run,sec*1000)};
- if(voice)speak("Mẹ ngồi thoải mái, đặt tay lên bụng, và cùng thở theo vòng tròn nhé.");bTimer=setTimeout(run,voice?3500:500)};
+  const [label,scale,cue]=phases[k];$("circle").textContent=label;$("circle").style.transitionDuration=sec+"s";$("circle").style.transform=`scale(${scale})`;
+  if(voice)say("breath-"+cue);$("bLeft").textContent="còn "+fmt((end-Date.now())/1000);bTimer=setTimeout(run,sec*1000)};
+ if(voice)say("breath-intro");bTimer=setTimeout(run,voice?5500:500)};
 
 // ===== Truyện =====
 $("stories").innerHTML=STORIES.map((s,i)=>`<details class="story" data-i="${i}"><summary>📖 ${s.t}</summary>${s.p.map(p=>`<p>${p}</p>`).join("")}<button class="btn ghost" data-read>🔊 Nghe đọc</button> <span class="muted" data-msg></span></details>`).join("");
 $("stories").onclick=e=>{const b=e.target.closest("[data-read]");if(!b)return;const d=b.closest("details"),s=STORIES[d.dataset.i];
- if(b.dataset.on){speechSynthesis.cancel();delete b.dataset.on;b.textContent="🔊 Nghe đọc";return}
- if(!speak(s.t+". "+s.p.join(" "),.85)){d.querySelector("[data-msg]").textContent="Máy chưa có giọng đọc, mẹ đọc to cho bé nghe nhé.";return}
- if(!speechSynthesis.getVoices().some(v=>/^vi/i.test(v.lang)))d.querySelector("[data-msg]").textContent="Máy chưa cài giọng tiếng Việt nên giọng đọc có thể chưa chuẩn.";
+ const reset=()=>document.querySelectorAll("[data-read]").forEach(x=>{delete x.dataset.on;x.textContent="🔊 Nghe đọc"});
+ if(b.dataset.on){voiceAudio&&voiceAudio.pause();reset();return}
+ stopBreath();if(out){stop();ui()}reset();
+ const a=say("story-"+(+d.dataset.i+1));a.onended=reset;a.onerror=()=>{reset();d.querySelector("[data-msg]").textContent="Chưa tải được giọng đọc, mẹ kiểm tra kết nối mạng nhé."};
  b.dataset.on=1;b.textContent="⏹ Dừng đọc"};
 
 // ===== Nhật ký: tự cộng thời gian nghe =====
 let log=store.get("log",{}),logStart=0,lastSave=Date.now();
-setInterval(()=>{const playing=!!out||(recAudio&&!recAudio.paused);if(!playing)return;const k=dayKey(Date.now());
+setInterval(()=>{const playing=!!out||(recAudio&&!recAudio.paused)||(voiceAudio&&!voiceAudio.paused);if(!playing)return;const k=dayKey(Date.now());
  log[k]=log[k]||{s:0};log[k].s+=1;if(Date.now()-lastSave>10000){store.set("log",log);lastSave=Date.now()}
  if(!$("v-diary").hidden&&log[k].s%10===0)renderDiary()},1000);
 addEventListener("pagehide",()=>store.set("log",log));

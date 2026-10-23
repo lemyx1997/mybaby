@@ -1,5 +1,5 @@
 // Giúp ứng dụng mở được khi không có mạng: lưu sẵn phần chính, bản nhạc nào đã nghe thì lưu lại để lần sau nghe offline.
-const CORE = 'mybaby-core-v3', MUSIC = 'mybaby-nhac-v1';
+const CORE = 'mybaby-core-v4', MUSIC = 'mybaby-nhac-v1';
 const FILES = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {
@@ -12,8 +12,8 @@ self.addEventListener('fetch', e => {
   const req = e.request;
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
-  // Nhạc: tải trọn bài lần đầu rồi lưu lại (bỏ qua yêu cầu tải từng đoạn để lưu được cả bài).
-  if (/\/music\//.test(url.pathname)) {
+  // Nhạc và giọng đọc: tải trọn bài lần đầu rồi lưu lại (bỏ qua yêu cầu tải từng đoạn để lưu được cả bài).
+  if (/\/(music|voice)\//.test(url.pathname)) {
     e.respondWith(caches.open(MUSIC).then(async c => (await c.match(url.pathname)) || fetch(url.pathname).then(r => { if (r.ok) c.put(url.pathname, r.clone()); return r; })));
     return;
   }
