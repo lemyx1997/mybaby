@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#e58fa8">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>Mybaby</title>
+<style>
+:root{--bg:#fdf6f0;--card:#fff;--ink:#4a3b47;--muted:#9a8a95;--accent:#e58fa8;--accent2:#8fb8e5;--line:#f0e2e6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1f1a22;--card:#2a2330;--ink:#f3e8ee;--muted:#a898a8;--line:#3a3040;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1f1a22;--card:#2a2330;--ink:#f3e8ee;--muted:#a898a8;--line:#3a3040;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:system-ui,"Segoe UI",sans-serif;padding:16px 16px 190px}
+h1{margin:8px 0 4px;font-size:26px}
+.sub{color:var(--muted);margin:0 0 18px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.tab{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:8px 14px;border-radius:999px;cursor:pointer;font-size:15px}
+.tab.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+.desc{background:var(--card);border-radius:14px;padding:12px 14px;margin-bottom:14px;color:var(--muted);font-size:14px;border:1px solid var(--line)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px}
+.track{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;cursor:pointer;transition:.2s}
+.track:hover{transform:translateY(-2px);border-color:var(--accent)}
+.track.playing{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.emo{font-size:30px}
+.track b{display:block;margin:6px 0 4px}
+.track small{color:var(--muted)}
+.tip{display:inline-block;margin-top:8px;font-size:12px;background:var(--line);padding:3px 8px;border-radius:8px}
+.player{position:fixed;left:0;right:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding:12px 16px;display:flex;flex-direction:column;gap:8px}
+.row{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.big{width:52px;height:52px;border-radius:50%;border:none;background:var(--accent);color:#fff;font-size:22px;cursor:pointer}
+.now{flex:1;min-width:150px}
+.now b{display:block}
+.now small{color:var(--muted)}
+select,input[type=range]{accent-color:var(--accent)}
+select{padding:6px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+.wave{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));opacity:.25;transition:.3s}
+.wave.on{opacity:1;animation:pulse 3s ease-in-out infinite}
+@keyframes pulse{50%{transform:scaleX(.85)}}
+.guide{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 18px}
+.guide h3{margin-top:0}
+.guide li{margin:6px 0}
+.player{padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}
+</style>
+<h1>🤰 Mybaby – Nhạc Thai Giáo</h1>
+<p class="sub">Âm nhạc nhẹ nhàng cho mẹ và bé – mọi âm thanh được tạo trực tiếp, không cần mạng.</p>
+<div class="tabs" id="tabs"></div>
+<div class="desc" id="desc"></div>
+<div class="grid" id="grid"></div>
+
+<div class="guide">
+<h3>💡 Gợi ý nghe theo thời điểm</h3>
+<ul>
+<li>🌅 <b>Buổi sáng</b>: Hòa tấu “Chào buổi sáng con yêu”, Thiên nhiên “Chim hót bình minh”.</li>
+<li>🍵 <b>Giờ nghỉ trưa</b>: Thư giãn “Hơi thở sâu”, Thiên nhiên “Suối chảy rừng xanh”.</li>
+<li>📖 <b>Buổi tối trò chuyện cùng bé</b>: Giao hưởng “Canon dịu dàng”, Ru con “Ầu ơ ví dầu”.</li>
+<li>🌙 <b>Trước khi ngủ</b>: Ru con “Hộp nhạc ngủ ngoan”, Thiên nhiên “Mưa đêm”. Đặt hẹn giờ tắt 30 phút.</li>
+<li>🎧 Bản có nhãn “Bản thu thật” là nhạc cổ điển miễn phí từ Wikimedia Commons (cần mạng để nghe).</li>
+<li>🔊 Âm lượng vừa phải (như tiếng nói chuyện nhỏ), nghe 15–30 phút mỗi lần, 2–3 lần/ngày. Không áp loa trực tiếp lên bụng.</li>
+</ul>
+</div>
+
+<div class="player">
+<div class="wave" id="wave"></div>
+<div class="row">
+<button class="big" id="play">▶</button>
+<div class="now"><b id="nowT">Chọn một bản nhạc</b><small id="nowS">—</small></div>
+<label>🔈 <input type="range" id="vol" min="0" max="1" step="0.01" value="0.6"></label>
+<label>⏱ <select id="timer"><option value="0">Không hẹn giờ</option><option value="15">15 phút</option><option value="30">30 phút</option><option value="45">45 phút</option><option value="60">60 phút</option></select></label>
+<small id="left" style="color:var(--muted)"></small>
+</div>
+</div>
+
+<script>
+const CATS={
+ nature:{n:"🌿 Thiên nhiên",d:"Âm thanh tự nhiên giúp mẹ bình tâm, giảm căng thẳng – bé cảm nhận nhịp sống êm ả."},
+ relax:{n:"🧘 Thư giãn",d:"Những lớp âm êm, chậm, hợp để mẹ hít thở sâu, thiền hoặc tập yoga bầu."},
+ inst:{n:"🎹 Hòa tấu",d:"Giai điệu piano, hộp nhạc trong trẻo, kích thích thính giác của bé."},
+ sym:{n:"🎻 Giao hưởng",d:"Hòa âm dàn dây theo phong cách cổ điển (Pachelbel, Bach…) – tốt cho sự phát triển trí não."},
+ lull:{n:"🌙 Ru con",d:"Những làn điệu ru dịu dàng giúp mẹ ngủ ngon và tạo kết nối với con."},
+ joy:{n:"☀️ Vui tươi",d:"Giai điệu tươi sáng cho buổi sáng tràn năng lượng."}
+};
+const TRACKS=[
+ {c:"nature",e:"🌧️",t:"Mưa đêm",s:"Tiếng mưa rơi đều, ấm áp",tip:"Trước khi ngủ",g:{type:"rain"}},
+ {c:"nature",e:"🌊",t:"Sóng biển vỗ về",s:"Sóng lên xuống như nhịp thở",tip:"Thả lỏng cơ thể",g:{type:"ocean"}},
+ {c:"nature",e:"🐦",t:"Chim hót bình minh",s:"Rừng sớm mai với tiếng chim",tip:"Buổi sáng",g:{type:"birds"}},
+ {c:"nature",e:"🏞️",t:"Suối chảy rừng xanh",s:"Dòng suối róc rách",tip:"Giờ nghỉ trưa",g:{type:"stream"}},
+ {c:"nature",e:"💓",t:"Nhịp tim mẹ",s:"Âm thanh quen thuộc nhất của bé",tip:"Bé an tâm",g:{type:"heart"}},
+ {c:"relax",e:"🌸",t:"Hơi thở sâu",s:"Âm nền trầm, chậm rãi",tip:"Thiền 10 phút",g:{type:"pad",chords:[[57,64,69,72],[53,60,65,69],[55,62,67,71],[52,59,64,67]],dur:8}},
+ {c:"relax",e:"☁️",t:"Mây trôi",s:"Lơ lửng, nhẹ tênh",tip:"Yoga bầu",g:{type:"pad",chords:[[60,67,72,76],[57,64,69,72],[65,72,77,81],[62,69,74,77]],dur:10,bell:true}},
+ {c:"relax",e:"🕯️",t:"Bình yên",s:"Chuông thiền ngân nga",tip:"Giảm lo âu",g:{type:"bowls"}},
+ {c:"inst",e:"🎹",t:"Chào buổi sáng con yêu",s:"Piano nhẹ nhàng",tip:"Buổi sáng",g:{type:"melody",bpm:72,wave:"triangle",notes:"C5 E5 G5 E5 F5 A5 G5 - E5 G5 C6 B5 A5 G5 F5 E5 D5 E5 C5 - - - "}},
+ {c:"inst",e:"⭐",t:"Ngôi sao lấp lánh",s:"Twinkle Twinkle – hộp nhạc",tip:"Bé nghe giai điệu",g:{type:"melody",bpm:80,wave:"sine",box:true,notes:"C5 C5 G5 G5 A5 A5 G5 - F5 F5 E5 E5 D5 D5 C5 - G5 G5 F5 F5 E5 E5 D5 - G5 G5 F5 F5 E5 E5 D5 - "}},
+ {c:"inst",e:"🎼",t:"Ode to Joy",s:"Beethoven – bản hòa tấu nhẹ",tip:"Phát triển trí nhớ",g:{type:"melody",bpm:84,wave:"triangle",notes:"E5 E5 F5 G5 G5 F5 E5 D5 C5 C5 D5 E5 E5 - D5 D5 E5 E5 F5 G5 G5 F5 E5 D5 C5 C5 D5 E5 D5 - C5 C5 "}},
+ {c:"sym",e:"🎻",t:"Canon dịu dàng",s:"Theo Pachelbel – dàn dây",tip:"Buổi tối",g:{type:"strings",chords:[[50,62,66,69],[45,61,64,69],[47,62,66,71],[42,61,66,69],[43,59,62,67],[38,57,62,66],[43,59,62,67],[45,57,61,64]],dur:3}},
+ {c:"sym",e:"🏛️",t:"Air thanh thản",s:"Phong cách Bach",tip:"Đọc sách cùng bé",g:{type:"strings",chords:[[48,60,64,67],[45,60,64,69],[41,57,65,69],[43,59,62,67],[40,55,64,67],[41,57,60,65],[38,57,62,65],[43,55,62,71]],dur:4}},
+ {c:"sym",e:"🌌",t:"Bầu trời sao",s:"Giao hưởng mênh mang",tip:"Trước khi ngủ",g:{type:"strings",chords:[[41,60,65,69],[43,59,62,67],[45,60,64,69],[40,59,64,67]],dur:6}},
+ {c:"lull",e:"🧸",t:"Hộp nhạc ngủ ngoan",s:"Brahms Lullaby",tip:"Ru ngủ",g:{type:"melody",bpm:66,wave:"sine",box:true,notes:"E5 E5 G5 - E5 E5 G5 - E5 G5 C6 B5 A5 A5 G5 - D5 E5 F5 D5 D5 E5 F5 - D5 F5 B5 A5 G5 B5 C6 - "}},
+ {c:"lull",e:"🌾",t:"Ầu ơ ví dầu",s:"Âm hưởng ru miền Nam",tip:"Mẹ hát theo",g:{type:"melody",bpm:56,wave:"sine",notes:"G4 C5 C5 D5 C5 A4 G4 - A4 C5 D5 F5 D5 C5 - - G4 A4 C5 A4 G4 F4 G4 - - - "}},
+ {c:"joy",e:"🌻",t:"Nắng mai",s:"Tươi sáng, rộn ràng nhẹ",tip:"Năng lượng buổi sáng",g:{type:"melody",bpm:96,wave:"triangle",notes:"C5 D5 E5 G5 A5 G5 E5 - D5 E5 G5 A5 C6 A5 G5 - E5 G5 A5 G5 E5 D5 C5 D5 E5 - - - "}},
+ {c:"joy",e:"🦋",t:"Vườn hoa bướm",s:"Hộp nhạc nhảy nhót",tip:"Vận động nhẹ",g:{type:"melody",bpm:104,wave:"sine",box:true,notes:"G5 E5 C5 E5 G5 C6 B5 A5 G5 - F5 D5 B4 D5 F5 A5 G5 - - "}}
+];
+// Bản thu thật, miễn phí từ Wikimedia Commons (tự do bản quyền hoặc giấy phép mở)
+const W="music/";
+TRACKS.push(
+ {c:"sym",e:"🎻",t:"Air on the G String",s:"J.S. Bach – Dàn dây Không quân Hoa Kỳ",tip:"Buổi tối thư thái",lic:"Public domain",g:{type:"audio",src:W+"air.mp3"}},
+ {c:"sym",e:"💐",t:"Canon in D",s:"Pachelbel – bản phối 1694",tip:"Kết nối mẹ và bé",lic:"CC BY 4.0",g:{type:"audio",src:W+"canon.mp3"}},
+ {c:"sym",e:"🌱",t:"Mùa xuân – Largo",s:"Vivaldi, Bốn mùa – John Harrison",tip:"Thư giãn sâu",lic:"CC BY-SA 4.0",g:{type:"audio",src:W+"largo.ogg"}},
+ {c:"sym",e:"🦢",t:"Thiên nga",s:"Saint-Saëns – Cello & piano",tip:"Trước khi ngủ",lic:"Public domain",g:{type:"audio",src:W+"swan.ogg"}},
+ {c:"inst",e:"🌃",t:"Nocturne Op.9 No.2",s:"Chopin – piano",tip:"Thư giãn sau ngày dài",lic:"Public domain",g:{type:"audio",src:W+"nocturne.mp3"}},
+ {c:"relax",e:"💌",t:"Für Elise",s:"Beethoven – piano",tip:"Nhẹ nhàng mọi lúc",lic:"CC BY-SA 4.0",g:{type:"audio",src:W+"elise.ogg"}},
+ {c:"lull",e:"⏰",t:"Ru con của Brahms",s:"Hộp nhạc lên dây cót",tip:"Ru ngủ",lic:"Public domain",g:{type:"audio",src:W+"brahms-clock.ogg"}},
+ {c:"lull",e:"🎶",t:"Wiegenlied Op.49 số 4",s:"Brahms – bản ru nguyên gốc",tip:"Mẹ ngủ ngon",lic:"Public domain",g:{type:"audio",src:W+"wiegenlied.ogg"}}
+);
+
+let ctx,master,cur=null,stopFns=[],timers=[],catSel="nature",endAt=0;
+const $=id=>document.getElementById(id);
+const mtof=m=>440*Math.pow(2,(m-69)/12);
+const N={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+const note=s=>12*(+s.slice(-1)+1)+N[s[0]]+(s[1]=="#"?1:0);
+
+function init(){if(ctx)return;ctx=new AudioContext();master=ctx.createGain();master.gain.value=$("vol").value;
+ const comp=ctx.createDynamicsCompressor();master.connect(comp).connect(ctx.destination);}
+function noiseBuf(){const b=ctx.createBuffer(1,ctx.sampleRate*4,ctx.sampleRate),d=b.getChannelData(0);let last=0;
+ for(let i=0;i<d.length;i++){const w=Math.random()*2-1;last=(last+0.02*w)/1.02;d[i]=last*3.5}return b}
+function whiteBuf(){const b=ctx.createBuffer(1,ctx.sampleRate*2,ctx.sampleRate),d=b.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;return b}
+function loopNoise(buf,filt,freq,gain){const s=ctx.createBufferSource();s.buffer=buf;s.loop=true;const f=ctx.createBiquadFilter();f.type=filt;f.frequency.value=freq;const g=ctx.createGain();g.gain.value=gain;s.connect(f).connect(g).connect(out);s.start();stopFns.push(()=>s.stop());return {s,f,g}}
+function every(ms,fn){fn();const id=setInterval(fn,ms);timers.push(id)}
+let out;
+function tone(freq,t,dur,{type="sine",vol=.2,att=.02,rel=null,dest}={}){
+ const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=freq;
+ g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(vol,t+att);g.gain.exponentialRampToValueAtTime(0.0001,t+(rel??dur));
+ o.connect(g).connect(dest||out);o.start(t);o.stop(t+(rel??dur)+.1)}
+function makeReverb(){const len=ctx.sampleRate*3,b=ctx.createBuffer(2,len,ctx.sampleRate);
+ for(let c=0;c<2;c++){const d=b.getChannelData(c);for(let i=0;i<len;i++)d[i]=(Math.random()*2-1)*Math.pow(1-i/len,3)}
+ const cv=ctx.createConvolver();cv.buffer=b;return cv}
+
+const GEN={
+ audio(g){const a=new Audio();a.src=g.src;a.loop=true;
+  const s=ctx.createMediaElementSource(a);s.connect(out);a.play().catch(()=>{$("nowS").textContent="Không tải được – kiểm tra kết nối mạng"});
+  stopFns.push(()=>{setTimeout(()=>{a.pause();a.src=""},1100)})},
+ rain(){loopNoise(noiseBuf(),"lowpass",1200,.5);const w=loopNoise(whiteBuf(),"highpass",4000,.04);
+  every(80,()=>{if(Math.random()<.4)tone(2000+Math.random()*3000,ctx.currentTime,.03,{vol:.03})})},
+ ocean(){const n=loopNoise(noiseBuf(),"lowpass",500,.2);const t0=ctx.currentTime;
+  for(let i=0;i<400;i++){const t=t0+i*8;n.g.gain.linearRampToValueAtTime(.9,t+3.5);n.g.gain.linearRampToValueAtTime(.15,t+8);
+   n.f.frequency.linearRampToValueAtTime(1100,t+3.5);n.f.frequency.linearRampToValueAtTime(400,t+8)}},
+ birds(){loopNoise(noiseBuf(),"bandpass",800,.08);
+  every(1400,()=>{if(Math.random()<.7){let t=ctx.currentTime+Math.random();const base=2500+Math.random()*2000,n=2+Math.floor(Math.random()*5);
+   for(let i=0;i<n;i++){const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.setValueAtTime(base,t);o.frequency.exponentialRampToValueAtTime(base*(1.2+Math.random()*.5),t+.08);
+    g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.06,t+.01);g.gain.exponentialRampToValueAtTime(.0001,t+.12);o.connect(g).connect(out);o.start(t);o.stop(t+.15);t+=.13+Math.random()*.1}}})},
+ stream(){loopNoise(noiseBuf(),"bandpass",900,.6);loopNoise(whiteBuf(),"bandpass",2500,.03);
+  every(60,()=>{if(Math.random()<.5)tone(400+Math.random()*900,ctx.currentTime,.06,{vol:.04})})},
+ heart(){loopNoise(noiseBuf(),"lowpass",300,.15);every(857,()=>{const t=ctx.currentTime;tone(55,t,.15,{vol:.6});tone(50,t+.25,.15,{vol:.4})})},
+ pad(g){const rv=makeReverb();rv.connect(out);let i=0;
+  every(g.dur*1000,()=>{const t=ctx.currentTime;g.chords[i++%g.chords.length].forEach(m=>{
+   [0,4].forEach(dt=>tone(mtof(m)*(1+dt/1000),t,g.dur,{vol:.05,att:g.dur*.4,rel:g.dur*1.3,dest:rv}))});
+   if(g.bell)tone(mtof(g.chords[(i-1)%g.chords.length][3]+12),t+g.dur/2,4,{vol:.04,dest:rv})})},
+ bowls(){const rv=makeReverb();rv.connect(out);loopNoise(noiseBuf(),"lowpass",200,.05);
+  every(7000,()=>{const t=ctx.currentTime,f=[196,220,261.6,293.7][Math.floor(Math.random()*4)];[1,2.76,5.4].forEach((h,k)=>tone(f*h,t,9,{vol:.1/(k+1),att:.01,dest:rv}))})},
+ strings(g){const rv=makeReverb();rv.connect(out);const lp=ctx.createBiquadFilter();lp.frequency.value=2200;lp.connect(rv);let i=0;
+  every(g.dur*1000,()=>{const t=ctx.currentTime;g.chords[i++%g.chords.length].forEach((m,k)=>{
+   [-6,0,6].forEach(dt=>{const o=ctx.createOscillator(),v=ctx.createGain();o.type="sawtooth";o.frequency.value=mtof(m);o.detune.value=dt;
+    v.gain.setValueAtTime(0,t);v.gain.linearRampToValueAtTime(k?.018:.03,t+g.dur*.35);v.gain.linearRampToValueAtTime(0,t+g.dur*1.15);o.connect(v).connect(lp);o.start(t);o.stop(t+g.dur*1.2)})})})},
+ melody(g){const rv=makeReverb();rv.connect(out);const notes=g.notes.trim().split(/\s+/),beat=60/g.bpm;let i=0;
+  every(beat*1000,()=>{const s=notes[i++%notes.length],t=ctx.currentTime+.05;if(s==="-")return;const f=mtof(note(s));
+   if(g.box){tone(f,t,2.2,{vol:.12,att:.005,dest:rv});tone(f*4,t,.6,{vol:.02,att:.005,dest:rv})}
+   else{tone(f,t,beat*2.5,{type:g.wave,vol:.15,att:.01,dest:rv});tone(f/2,t,beat*3,{vol:.05,dest:rv})}
+   if(i%4===1)tone(f/4,t,beat*4,{vol:.05,att:.1,dest:rv})})}
+};
+
+function stop(){stopFns.forEach(f=>{try{f()}catch(e){}});stopFns=[];timers.forEach(clearInterval);timers=[];
+ if(out){const o=out;o.gain.linearRampToValueAtTime(0,ctx.currentTime+1);setTimeout(()=>o.disconnect(),1200)}out=null}
+function play(tr){init();ctx.resume();stop();cur=tr;out=ctx.createGain();out.gain.setValueAtTime(0,ctx.currentTime);
+ out.gain.linearRampToValueAtTime(1,ctx.currentTime+2);out.connect(master);GEN[tr.g.type](tr.g);ui();setTimer()}
+function toggle(){if(!cur){play(TRACKS.find(t=>t.c===catSel));return}
+ if(out){stop();ui()}else play(cur)}
+function setTimer(){const m=+$("timer").value;endAt=m?Date.now()+m*60000:0}
+setInterval(()=>{if(endAt&&out){const s=Math.max(0,Math.round((endAt-Date.now())/1000));$("left").textContent="còn "+Math.floor(s/60)+":"+String(s%60).padStart(2,"0");if(!s){stop();ui();endAt=0}}else $("left").textContent=""},1000);
+
+function ui(){$("play").textContent=out?"⏸":"▶";$("wave").classList.toggle("on",!!out);
+ if(cur){$("nowT").textContent=cur.e+" "+cur.t;$("nowS").textContent=CATS[cur.c].n+" · "+cur.s}
+ document.querySelectorAll(".track").forEach(el=>el.classList.toggle("playing",out&&TRACKS[el.dataset.i]===cur))}
+function render(){
+ $("tabs").innerHTML=Object.entries(CATS).map(([k,v])=>`<button class="tab ${k===catSel?"on":""}" data-k="${k}">${v.n}</button>`).join("");
+ $("desc").textContent=CATS[catSel].d;
+ $("grid").innerHTML=TRACKS.map((t,i)=>t.c!==catSel?"":`<div class="track" data-i="${i}"><div class="emo">${t.e}</div><b>${t.t}</b><small>${t.s}</small><br><span class="tip">💡 ${t.tip}</span>${t.lic?` <span class="tip" title="Giấy phép: ${t.lic} – Wikimedia Commons">🎧 Bản thu thật</span>`:""}</div>`).join("");
+ ui()}
+$("tabs").onclick=e=>{if(e.target.dataset.k){catSel=e.target.dataset.k;render()}};
+$("grid").onclick=e=>{const el=e.target.closest(".track");if(el){const t=TRACKS[el.dataset.i];(t===cur&&out)?(stop(),ui()):play(t)}};
+$("play").onclick=toggle;
+$("vol").oninput=e=>{if(master)master.gain.value=e.target.value};
+$("timer").onchange=setTimer;
+render();
+</script>
+
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+</html>
