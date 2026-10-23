@@ -69,16 +69,57 @@ details li{margin:4px 0}
 input[type=range]{accent-color:var(--accent)}
 select{padding:3px 4px;border-radius:6px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
 #left{color:var(--accent);font-variant-numeric:tabular-nums}
+.nav{display:flex;gap:4px;margin:8px 0 10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:3px;overflow-x:auto;scrollbar-width:none}
+.nav button{flex:1 0 auto;border:0;background:none;color:var(--muted);font:inherit;font-size:13px;padding:7px 8px;border-radius:9px;cursor:pointer;white-space:nowrap}
+.nav button.on{background:var(--accent-soft);color:var(--accent);font-weight:500}
+.sec-t{font-size:13px;color:var(--muted);margin:14px 0 6px;font-weight:500}
+.pls{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.pl{flex:none;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:12px;padding:8px 12px;cursor:pointer;font:inherit;font-size:13.5px;text-align:left}
+.pl small{display:block;color:var(--muted);font-size:11.5px}
+.pl.on{border-color:var(--accent);background:var(--accent-soft)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:12px}
+.card h3{margin:0 0 6px;font-size:16px}
+.muted{color:var(--muted);font-size:13px}
+.btn{border:0;background:var(--accent);color:#fff;font:inherit;font-weight:500;padding:8px 14px;border-radius:10px;cursor:pointer}
+.btn.ghost{background:var(--accent-soft);color:var(--accent)}
+.btn:disabled{opacity:.5;cursor:default}
+.field{padding:7px 10px;border-radius:9px;border:1px solid var(--line);background:var(--bg);color:var(--ink);font:inherit}
+.week{display:flex;align-items:center;gap:14px}
+.week .num{font-size:40px;font-weight:700;color:var(--accent);line-height:1;font-variant-numeric:tabular-nums}
+.meter{height:8px;background:var(--bg);border-radius:4px;overflow:hidden;margin:10px 0 4px}
+.meter i{display:block;height:100%;background:var(--accent);border-radius:4px}
+.rec{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:1px solid var(--line)}
+.rec:first-child{border-top:0}
+.rec .info{font-size:14px}
+.bars{display:flex;align-items:flex-end;gap:6px;height:90px;margin-top:10px}
+.bars div{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:var(--muted);height:100%;justify-content:flex-end;font-variant-numeric:tabular-nums}
+.bars i{display:block;width:100%;background:var(--accent);border-radius:4px 4px 0 0;min-height:2px}
+.stats{display:flex;gap:10px}
+.stats div{flex:1;background:var(--bg);border-radius:10px;padding:10px;text-align:center}
+.stats b{display:block;font-size:22px;color:var(--accent);font-variant-numeric:tabular-nums}
+textarea.field{width:100%;min-height:70px;resize:vertical}
+.breath{display:grid;place-items:center;height:220px}
+.circle{width:90px;height:90px;border-radius:50%;background:var(--accent-soft);border:2px solid var(--accent);display:grid;place-items:center;color:var(--accent);font-weight:500;transition:transform 4s ease-in-out}
+.story p{margin:8px 0;line-height:1.6}
+.dot{width:10px;height:10px;border-radius:50%;background:#e04a5f;display:inline-block;animation:blink 1s infinite}
+@keyframes blink{50%{opacity:.2}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <header><div class="wrap">
  <div class="top"><h1>Mybaby <span>· nhạc thai giáo</span></h1></div>
  <div class="hello" id="hello"></div>
+ <nav class="nav" id="nav">
+  <button data-v="listen" class="on">🎵 Nghe</button><button data-v="preg">🤰 Thai kỳ</button><button data-v="voice">🎙️ Giọng mẹ</button><button data-v="story">📖 Truyện & thở</button><button data-v="diary">📔 Nhật ký</button>
+ </nav>
+ <div id="listenHead">
  <input class="search" id="q" type="search" placeholder="Tìm bài: Mozart, mưa, ru con…">
  <div class="chips" id="tabs"></div>
+ </div>
 </div></header>
 
-<main class="wrap">
+<main class="wrap" id="v-listen">
+ <div class="sec-t">Bộ nhạc theo buổi · bấm để phát cả bộ</div>
+ <div class="pls" id="pls"></div>
  <div class="bar"><span id="count"></span><label><input type="checkbox" id="realOnly"> Chỉ bản thu thật 🎧</label></div>
  <div class="list" id="grid"></div>
  <details>
@@ -89,6 +130,62 @@ select{padding:3px 4px;border-radius:6px;border:1px solid var(--line);background
    <li>🎧 “Bản thu thật” là nhạc cổ điển miễn phí từ Wikimedia Commons. Các bản còn lại do ứng dụng tự tạo ra, nghe được cả khi không có mạng.</li>
   </ul>
  </details>
+</main>
+
+<main class="wrap" id="v-preg" hidden>
+ <div class="card">
+  <h3>Ngày dự sinh của mẹ</h3>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><input class="field" type="date" id="due"><span class="muted">Ứng dụng tự tính bé đang ở tuần thứ mấy.</span></div>
+ </div>
+ <div class="card" id="pregCard"><p class="muted">Nhập ngày dự sinh để xem bé đang lớn thế nào và nhận gợi ý nhạc theo từng giai đoạn.</p></div>
+</main>
+
+<main class="wrap" id="v-voice" hidden>
+ <div class="card">
+  <h3>Thu giọng mẹ cho bé</h3>
+  <p class="muted">Từ khoảng tuần 18, bé bắt đầu nghe được âm thanh, và giọng mẹ là âm thanh bé quen nhất. Mẹ có thể chào con, kể chuyện, hát ru… rồi phát lại mỗi ngày. Bản ghi chỉ lưu trên máy này.</p>
+  <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px">
+   <input class="field" id="recName" placeholder="Tên bản ghi (vd: Mẹ chào con buổi sáng)" style="flex:1;min-width:180px">
+   <button class="btn" id="recBtn">⏺ Bắt đầu thu</button>
+  </div>
+  <p class="muted" id="recMsg" style="margin:8px 0 0"></p>
+ </div>
+ <div class="card"><h3>Các bản đã thu</h3><div id="recList"><p class="muted">Chưa có bản ghi nào.</p></div></div>
+ <div class="card"><h3>Gợi ý lời nói với con</h3><ul class="muted" style="padding-left:18px;margin:4px 0">
+  <li>“Chào con yêu, mẹ đây. Hôm nay trời đẹp lắm, mẹ con mình cùng nghe nhạc nhé.”</li>
+  <li>Kể con nghe một ngày của mẹ: mẹ ăn gì, đi đâu, gặp ai.</li>
+  <li>Hát một bài ru quen thuộc: “Ví dầu cầu ván đóng đinh…”</li>
+  <li>Bố cũng thu một bản để bé làm quen với giọng bố.</li></ul></div>
+</main>
+
+<main class="wrap" id="v-story" hidden>
+ <div class="card">
+  <h3>Bài tập thở cho mẹ</h3>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+   <select class="field" id="bPat"><option value="4,4,6">Thở thư giãn (hít 4 · giữ 4 · thở 6)</option><option value="4,4,4,4">Thở hộp (4 · 4 · 4 · 4)</option><option value="4,0,6">Thở chậm (hít 4 · thở 6)</option></select>
+   <select class="field" id="bDur"><option value="3">3 phút</option><option value="5">5 phút</option><option value="10">10 phút</option></select>
+   <label class="muted"><input type="checkbox" id="bVoice" checked> Giọng hướng dẫn</label>
+  </div>
+  <div class="breath"><div class="circle" id="circle">Sẵn sàng</div></div>
+  <div style="display:flex;gap:8px;justify-content:center"><button class="btn" id="bStart">Bắt đầu</button><span class="muted" id="bLeft" style="align-self:center"></span></div>
+ </div>
+ <div class="sec-t">Truyện thai giáo · mẹ đọc to cho bé, hoặc bấm “Nghe đọc”</div>
+ <div id="stories"></div>
+</main>
+
+<main class="wrap" id="v-diary" hidden>
+ <div class="card">
+  <h3>Nhật ký thai giáo</h3>
+  <div class="stats"><div><b id="dToday">0</b><span class="muted">phút hôm nay</span></div><div><b id="dStreak">0</b><span class="muted">ngày liên tiếp</span></div><div><b id="dTotal">0</b><span class="muted">giờ tổng cộng</span></div></div>
+  <div class="bars" id="dBars"></div>
+  <p class="muted" style="margin:8px 0 0">Ứng dụng tự ghi thời gian nghe. Mục tiêu gợi ý: 30 phút mỗi ngày.</p>
+ </div>
+ <div class="card">
+  <h3>Ghi chú hôm nay</h3>
+  <textarea class="field" id="dNote" placeholder="Hôm nay bé đạp nhiều khi nghe Mozart…"></textarea>
+  <p class="muted" id="dSaved" style="margin:4px 0 0"></p>
+ </div>
+ <div class="card"><h3>Những ngày trước</h3><div id="dHist" class="muted">Chưa có ghi chú.</div></div>
 </main>
 
 <div class="player"><div class="wrap">
@@ -114,7 +211,8 @@ const CATS={
  inst:{n:"🎹 Hòa tấu",d:"Giai điệu piano, hộp nhạc trong trẻo, kích thích thính giác của bé."},
  sym:{n:"🎻 Giao hưởng",d:"Hòa âm dàn dây theo phong cách cổ điển (Pachelbel, Bach…) – tốt cho sự phát triển trí não."},
  lull:{n:"🌙 Ru con",d:"Những làn điệu ru dịu dàng giúp mẹ ngủ ngon và tạo kết nối với con."},
- joy:{n:"☀️ Vui tươi",d:"Giai điệu tươi sáng cho buổi sáng tràn năng lượng."}
+ joy:{n:"☀️ Vui tươi",d:"Giai điệu tươi sáng cho buổi sáng tràn năng lượng."},
+ baby:{n:"👶 Sau sinh",d:"Tiếng ồn trắng và âm thanh trong bụng mẹ giúp bé sơ sinh dễ ngủ."}
 };
 const TRACKS=[
  {c:"nature",e:"🌧️",t:"Mưa đêm",s:"Tiếng mưa rơi đều, ấm áp",tip:"Trước khi ngủ",g:{type:"rain"}},
@@ -183,6 +281,42 @@ TRACKS.push(
  {c:"joy",e:"🎉",t:"Rondo vui tươi",s:"Mozart – Eine kleine Nachtmusik",tip:"Bé vui đùa",lic:"Public domain",g:{type:"audio",src:W+"mozart-rondo.ogg"}}
 );
 
+// Làn điệu ru Việt Nam (giai điệu ngũ cung phỏng theo âm hưởng dân ca) và âm thanh cho bé sau sinh
+TRACKS.push(
+ {c:"lull",e:"🎋",t:"À ơi – ru Bắc Bộ",s:"Âm hưởng ru đồng bằng Bắc Bộ",tip:"Mẹ ngân theo",g:{type:"melody",bpm:52,wave:"sine",notes:"A4 C5 D5 - C5 A4 G4 - A4 C5 D5 E5 D5 C5 A4 - G4 A4 C5 A4 G4 E4 G4 - - - "}},
+ {c:"lull",e:"🏯",t:"Ru em – ru Huế",s:"Âm hưởng ru xứ Huế, chậm và sâu lắng",tip:"Trước khi ngủ",g:{type:"melody",bpm:48,wave:"sine",notes:"D5 F5 G5 - F5 D5 C5 - D5 F5 A5 G5 F5 D5 - - C5 D5 F5 D5 C5 A4 C5 D5 - - - "}},
+ {c:"lull",e:"🛶",t:"Hò ru sông nước",s:"Âm hưởng hò ru miền Tây",tip:"Thư thái",g:{type:"melody",bpm:54,wave:"triangle",notes:"C5 D5 F5 G5 - F5 D5 C5 - A4 C5 D5 C5 A4 G4 - - G4 A4 C5 D5 F5 D5 C5 - - - "}},
+ {c:"baby",e:"⚪",t:"Tiếng ồn trắng",s:"Như tiếng quạt, che tiếng động xung quanh",tip:"Bé ngủ sâu",g:{type:"noise",color:"white"}},
+ {c:"baby",e:"🌸",t:"Tiếng ồn hồng",s:"Êm hơn ồn trắng, như mưa đều",tip:"Ru giấc trưa",g:{type:"noise",color:"pink"}},
+ {c:"baby",e:"🟤",t:"Tiếng ồn nâu",s:"Trầm ấm như thác xa",tip:"Bé quấy khóc",g:{type:"noise",color:"brown"}},
+ {c:"baby",e:"🤫",t:"Tiếng suỵt suỵt",s:"Tiếng “shhh” nhịp nhàng mẹ hay dỗ con",tip:"Dỗ bé nín",g:{type:"shush"}},
+ {c:"baby",e:"🫄",t:"Âm thanh trong bụng mẹ",s:"Nhịp tim và tiếng máu chảy êm êm",tip:"Bé sơ sinh",g:{type:"womb"}}
+);
+// Bộ nhạc theo buổi (theo tên bài)
+const PLAYLISTS=[
+ {e:"🌅",n:"Sáng thức dậy",t:["Chim hót buổi sáng","Buổi sáng","Mùa xuân – Allegro","Sonata dễ thương","Chào buổi sáng con yêu"]},
+ {e:"🧘",n:"Yoga bầu",t:["Aria Goldberg","Gymnopédie số 1","Hơi thở sâu","Prelude Đô trưởng","Mây trôi"]},
+ {e:"🍵",n:"Nghỉ trưa",t:["Nước chảy róc rách","Rêverie","Mùa xuân – Largo","Bài ca không lời","Suối chảy rừng xanh"]},
+ {e:"📖",n:"Trò chuyện tối",t:["Canon in D","Air on the G String","Romanze","Giấc mơ tình yêu","Träumerei – Mơ mộng"]},
+ {e:"🌙",n:"Ru ngủ",t:["Berceuse","Wiegenlied Op.49 số 4","À ơi – ru Bắc Bộ","Ru con Ireland","Mưa đêm"]},
+ {e:"👶",n:"Bé sơ sinh ngủ",t:["Âm thanh trong bụng mẹ","Tiếng suỵt suỵt","Tiếng ồn hồng","Ru em – ru Huế"]}
+];
+// Kích thước bé theo tuần (ước lượng phổ biến)
+const SIZES={4:"hạt vừng",5:"hạt mè đen",6:"hạt đậu lăng",7:"quả việt quất",8:"quả mâm xôi",9:"quả nho",10:"quả quất",11:"quả sung",12:"quả chanh",13:"quả đào nhỏ",14:"quả chanh vàng",15:"quả táo",16:"quả bơ",17:"củ hành tây",18:"quả ớt chuông",19:"quả xoài",20:"quả chuối",21:"củ cà rốt",22:"quả đu đủ nhỏ",23:"quả bưởi chùm",24:"bắp ngô",25:"súp lơ",26:"bắp cải nhỏ",27:"cây xà lách",28:"quả cà tím",29:"quả bí ngô nhỏ",30:"bắp cải lớn",31:"quả dừa",32:"củ đậu lớn",33:"quả dứa",34:"quả dưa lưới",35:"quả dưa lê",36:"quả đu đủ",37:"bó cải",38:"quả bí đao",39:"quả dưa hấu nhỏ",40:"quả dưa hấu"};
+const STAGES=[
+ [1,12,"Tam cá nguyệt 1","Các cơ quan của bé đang hình thành. Đây là lúc mẹ cần thư giãn, ngủ đủ và giảm lo âu, nên nghe nhạc nhẹ nhàng và âm thanh thiên nhiên.","relax"],
+ [13,17,"Tam cá nguyệt 2","Bé lớn nhanh, tai đang hoàn thiện. Mẹ nên duy trì thói quen nghe nhạc mỗi ngày.","nature"],
+ [18,27,"Bé bắt đầu nghe","Từ khoảng tuần 18 bé nghe được âm thanh, đến tuần 24–25 bé phản ứng với tiếng động. Hợp nhất là nhạc piano, giao hưởng nhẹ và giọng mẹ trò chuyện.","inst"],
+ [28,36,"Tam cá nguyệt 3","Bé nhận ra giọng mẹ và những giai điệu quen thuộc. Mẹ hãy nghe đi nghe lại vài bài yêu thích và hát ru cho con.","sym"],
+ [37,42,"Sắp gặp con","Bé đã đủ tháng. Mẹ nghe nhạc ru, tập thở để chuẩn bị cho ngày sinh. Những bài này sau này dùng để ru bé ngủ rất hiệu quả.","lull"]
+];
+const STORIES=[
+ {t:"Hạt mầm nhỏ",p:["Ngày xửa ngày xưa, trong một khu vườn đầy nắng, có một hạt mầm nhỏ nằm ngủ say dưới lớp đất ấm.","Mỗi sáng, chị mưa khẽ tưới nước, anh gió thì thầm hát ru, còn ông mặt trời gửi xuống những tia nắng vàng ươm.","Hạt mầm cảm nhận được tình yêu ấy. Nó lớn lên từng ngày, nhú ra hai chiếc lá xanh non và mỉm cười chào thế giới.","Con yêu à, con cũng giống như hạt mầm nhỏ. Mẹ là khu vườn của con, ngày ngày ủ ấm và chờ con lớn lên khỏe mạnh."]},
+ {t:"Chú cá con và biển xanh",p:["Dưới lòng đại dương rộng lớn có một chú cá con tên là Bống. Bống thích bơi quanh những rặng san hô đủ màu sắc.","Mỗi tối, mẹ cá ôm Bống vào lòng và kể về những vì sao lấp lánh phía trên mặt nước.","Bống mơ một ngày được ngắm sao. Mẹ cá bảo: “Khi con lớn, mẹ sẽ đưa con lên xem”.","Rồi một đêm trăng tròn, hai mẹ con bơi lên mặt biển. Bầu trời đầy sao sáng, và Bống biết rằng ở bên mẹ là điều tuyệt vời nhất."]},
+ {t:"Gấu con đi ngủ",p:["Trời đã tối, khu rừng dần yên ắng. Gấu con dụi mắt, ngáp một cái thật to.","Gấu mẹ trải chiếc chăn lá mềm, hát một bài ru thật khẽ: “À ơi, con ngủ cho ngoan…”","Ngoài kia, đom đóm thắp đèn, dế mèn kéo đàn, gió đung đưa cành lá như đang ru cả khu rừng.","Gấu con nắm tay mẹ, mỉm cười và chìm vào giấc ngủ thật sâu. Ngủ ngoan nhé con yêu, mẹ luôn ở đây."]},
+ {t:"Lời mẹ gửi con",p:["Con yêu của mẹ, từ ngày biết có con, mỗi sáng thức dậy mẹ đều thấy lòng mình ấm áp hơn.","Mẹ tưởng tượng đôi mắt con, nụ cười con, bàn tay bé xíu của con nắm lấy ngón tay mẹ.","Mẹ hứa sẽ luôn yêu thương con, đọc truyện cho con nghe, hát ru con mỗi tối và cùng con khám phá thế giới.","Con cứ lớn lên bình an trong bụng mẹ nhé. Cả nhà đang chờ đón con từng ngày."]}
+];
+
 let ctx,master,cur=null,stopFns=[],timers=[],catSel="all",endAt=0,audioEl=null,autoNext=null;
 const MODES=[["next","➡️ Phát tiếp"],["one","🔂 Lặp 1 bài"],["shuffle","🔀 Ngẫu nhiên"]];
 const store={get(k,d){try{return JSON.parse(localStorage.getItem("mybaby-"+k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem("mybaby-"+k,JSON.stringify(v))}catch(e){}}};
@@ -214,6 +348,17 @@ const GEN={
   const s=ctx.createMediaElementSource(a);s.connect(out);a.play().catch(()=>{$("nowS").textContent="Không tải được – kiểm tra kết nối mạng"});
   a.onended=()=>step(1);
   stopFns.push(()=>{a.onended=null;setTimeout(()=>{a.pause();a.src=""},1100)})},
+ noise(g){const n=ctx.sampleRate*4,b=ctx.createBuffer(1,n,ctx.sampleRate),d=b.getChannelData(0);let b0=0,b1=0,b2=0,last=0;
+  for(let i=0;i<n;i++){const w=Math.random()*2-1;
+   if(g.color==="white")d[i]=w*.25;
+   else if(g.color==="pink"){b0=.99765*b0+w*.099;b1=.963*b1+w*.2965;b2=.57*b2+w*1.0527;d[i]=(b0+b1+b2+w*.1848)*.08}
+   else{last=(last+.02*w)/1.02;d[i]=last*3}}
+  const s=ctx.createBufferSource();s.buffer=b;s.loop=true;const g2=ctx.createGain();g2.gain.value=.8;s.connect(g2).connect(out);s.start();stopFns.push(()=>s.stop())},
+ shush(){const n=loopNoise(whiteBuf(),"bandpass",3500,0);n.f.Q.value=.8;const t0=ctx.currentTime;
+  for(let i=0;i<1500;i++){const t=t0+i*1.6;n.g.gain.setValueAtTime(0,t);n.g.gain.linearRampToValueAtTime(.35,t+.3);n.g.gain.linearRampToValueAtTime(.25,t+1);n.g.gain.linearRampToValueAtTime(0,t+1.4)}},
+ womb(){const n=loopNoise(noiseBuf(),"lowpass",350,.35),t0=ctx.currentTime;
+  for(let i=0;i<3000;i++){const t=t0+i*.8;n.g.gain.linearRampToValueAtTime(.55,t+.2);n.g.gain.linearRampToValueAtTime(.3,t+.8)}
+  every(800,()=>{const t=ctx.currentTime;tone(48,t,.18,{vol:.5});tone(44,t+.22,.15,{vol:.3})})},
  rain(){loopNoise(noiseBuf(),"lowpass",1200,.5);const w=loopNoise(whiteBuf(),"highpass",4000,.04);
   every(80,()=>{if(Math.random()<.4)tone(2000+Math.random()*3000,ctx.currentTime,.03,{vol:.03})})},
  ocean(){const n=loopNoise(noiseBuf(),"lowpass",500,.2);const t0=ctx.currentTime;
@@ -245,14 +390,16 @@ const GEN={
 
 function stop(){clearTimeout(autoNext);stopFns.forEach(f=>{try{f()}catch(e){}});stopFns=[];timers.forEach(clearInterval);timers=[];audioEl=null;
  if(out){const o=out;o.gain.linearRampToValueAtTime(0,ctx.currentTime+1);setTimeout(()=>o.disconnect(),1200)}out=null}
-function play(tr){init();ctx.resume();stop();cur=tr;out=ctx.createGain();out.gain.setValueAtTime(0,ctx.currentTime);
+function play(tr){init();ctx.resume();stop();cur=tr;if(recAudio&&!recAudio.paused){recAudio.pause();renderRecs()}out=ctx.createGain();out.gain.setValueAtTime(0,ctx.currentTime);
  out.gain.linearRampToValueAtTime(1,ctx.currentTime+2);out.connect(master);GEN[tr.g.type](tr.g);
  // Bản tự tạo phát vô tận: ở chế độ phát tiếp/ngẫu nhiên thì chuyển bài sau 5 phút
  if(!tr.lic&&mode!=="one")autoNext=setTimeout(()=>step(1),5*60000);
  if(!endAt)setTimer();ui();media()}
 // Danh sách đang hiển thị là hàng chờ phát
-function queue(){const q=$("q").value.trim().toLowerCase(),real=$("realOnly").checked;
- return TRACKS.filter(t=>(catSel==="all"||(catSel==="fav"?favs.has(t.id):t.c===catSel))&&(!real||t.lic)&&
+let pl=null;
+const plTracks=p=>p.t.map(n=>TRACKS.find(t=>t.t===n)).filter(Boolean);
+function queue(){if(pl)return plTracks(pl);const q=$("q").value.trim().toLowerCase(),real=$("realOnly").checked;
+ return TRACKS.filter(t=>(q||catSel==="all"||(catSel==="fav"?favs.has(t.id):t.c===catSel))&&(!real||t.lic)&&
   (!q||(t.t+" "+t.s+" "+t.tip+" "+CATS[t.c].n).toLowerCase().includes(q)))}
 function step(d){let q=queue();if(!q.length)q=TRACKS;let i=q.indexOf(cur);
  if(mode==="one"&&d===1&&cur&&!cur.lic)return;
@@ -280,25 +427,122 @@ function ui(){$("play").textContent=out?"⏸":"▶";$("play").setAttribute("aria
  document.querySelectorAll(".row").forEach(el=>el.classList.toggle("playing",!!out&&TRACKS[el.dataset.i]===cur))}
 function greet(){const h=new Date().getHours(),
  [txt,c]=h<5?["Đêm khuya rồi, mẹ nghỉ ngơi nhé","lull"]:h<11?["Chào buổi sáng mẹ và bé","nature"]:h<14?["Giờ nghỉ trưa thư thái","relax"]:h<18?["Buổi chiều nhẹ nhàng","inst"]:h<21?["Buổi tối bên con","sym"]:["Chuẩn bị ngủ ngon","lull"];
- $("hello").innerHTML=`${txt} · <button id="sugg">Nghe ${CATS[c].n}</button>`;
- $("sugg").onclick=()=>{catSel=c;render();toggle()}}
+ const p=pregWeek();
+ $("hello").innerHTML=`${p&&p.left>=0&&p.w>0?"🤰 Tuần "+p.w+" · ":""}${txt} · <button id="sugg">Nghe ${CATS[c].n}</button>`;
+ $("sugg").onclick=()=>{catSel=c;pl=null;show("listen");render();play(queue()[0])}}
 function render(){
  const tabs=[["all","✨ Tất cả"],["fav","❤️ Yêu thích"],...Object.entries(CATS).map(([k,v])=>[k,v.n])];
- $("tabs").innerHTML=tabs.map(([k,n])=>`<button class="chip ${k===catSel?"on":""}" data-k="${k}">${n}</button>`).join("");
+ $("tabs").innerHTML=tabs.map(([k,n])=>`<button class="chip ${k===catSel&&!pl?"on":""}" data-k="${k}">${n}</button>`).join("");
+ $("pls").innerHTML=PLAYLISTS.map((p,i)=>`<button class="pl ${pl===p?"on":""}" data-p="${i}">${p.e} ${p.n}<small>${plTracks(p).length} bài${pl===p?" · đang chọn":""}</small></button>`).join("");
  const q=queue();
- $("count").textContent=catSel==="fav"?q.length+" bài yêu thích":catSel==="all"?q.length+" bài":q.length+" bài · "+CATS[catSel].d.split(/[–.]/)[0].trim();
- $("grid").innerHTML=q.length?q.map(t=>{const i=TRACKS.indexOf(t);return `<div class="row" data-i="${i}"><div class="emo">${t.e}</div><div class="info"><div class="t">${t.t}</div><div class="s">${t.lic?'<span class="tag" title="Giấy phép '+t.lic+' – Wikimedia Commons">🎧 thu thật</span>':""}${catSel==="all"||catSel==="fav"?CATS[t.c].n+" · ":""}${t.s} · ${t.tip}</div></div><button class="fav ${favs.has(t.id)?"on":""}" aria-label="Yêu thích">${favs.has(t.id)?"♥":"♡"}</button></div>`}).join("")
+ $("count").textContent=pl?`Bộ “${pl.n}” · ${q.length} bài`:$("q").value.trim()?`Tìm thấy ${q.length} bài`:catSel==="fav"?q.length+" bài yêu thích":catSel==="all"?q.length+" bài":q.length+" bài · "+CATS[catSel].d.split(/[–.]/)[0].trim();
+ $("grid").innerHTML=q.length?q.map(t=>{const i=TRACKS.indexOf(t);return `<div class="row" data-i="${i}"><div class="emo">${t.e}</div><div class="info"><div class="t">${t.t}</div><div class="s">${t.lic?'<span class="tag" title="Giấy phép '+t.lic+' – Wikimedia Commons">🎧 thu thật</span>':""}${catSel==="all"||catSel==="fav"||pl||$("q").value.trim()?CATS[t.c].n+" · ":""}${t.s} · ${t.tip}</div></div><button class="fav ${favs.has(t.id)?"on":""}" aria-label="Yêu thích">${favs.has(t.id)?"♥":"♡"}</button></div>`}).join("")
   :`<div class="empty">${catSel==="fav"?"Chưa có bài yêu thích. Bấm ♡ cạnh bài hát để lưu lại.":"Không tìm thấy bài phù hợp."}</div>`;
  ui()}
-$("tabs").onclick=e=>{const k=e.target.closest(".chip")?.dataset.k;if(k){catSel=k;render()}};
+$("tabs").onclick=e=>{const k=e.target.closest(".chip")?.dataset.k;if(k){catSel=k;pl=null;render()}};
+$("pls").onclick=e=>{const b=e.target.closest(".pl");if(!b)return;const p=PLAYLISTS[b.dataset.p];
+ if(pl===p){pl=null;render();return}pl=p;$("q").value="";$("realOnly").checked=false;render();play(plTracks(p)[0])};
 $("grid").onclick=e=>{const el=e.target.closest(".row");if(!el)return;const t=TRACKS[el.dataset.i];
  if(e.target.closest(".fav")){favs.has(t.id)?favs.delete(t.id):favs.add(t.id);store.set("favs",[...favs]);render();return}
  (t===cur&&out)?(stop(),ui()):play(t)};
-$("q").oninput=render;$("realOnly").onchange=render;
+$("q").oninput=()=>{pl=null;render()};$("realOnly").onchange=render;
 $("play").onclick=toggle;$("prev").onclick=()=>step(-1);$("next").onclick=()=>step(1);
 $("mode").onclick=()=>{mode=MODES[(MODES.findIndex(m=>m[0]===mode)+1)%3][0];store.set("mode",mode);if(audioEl)audioEl.loop=mode==="one";ui()};
 $("vol").oninput=e=>{if(master)master.gain.value=e.target.value};
 $("timer").onchange=setTimer;
+$("nowS").textContent=TRACKS.length+" bài · "+Object.keys(CATS).length+" thể loại";
+
+// ===== Chuyển mục =====
+function show(v){document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
+ ["listen","preg","voice","story","diary"].forEach(k=>$("v-"+k).hidden=k!==v);$("listenHead").hidden=v!=="listen";
+ if(v==="diary")renderDiary();if(v==="voice")renderRecs();if(v==="preg")renderPreg();scrollTo(0,0)}
+$("nav").onclick=e=>{const v=e.target.closest("button")?.dataset.v;if(v)show(v)};
+
+// ===== Thai kỳ =====
+const DAY=864e5,dayKey=d=>{const x=new Date(d);return x.getFullYear()+"-"+String(x.getMonth()+1).padStart(2,"0")+"-"+String(x.getDate()).padStart(2,"0")};
+$("due").value=store.get("due","");
+$("due").onchange=()=>{store.set("due",$("due").value);renderPreg();greet()};
+function pregWeek(){const v=store.get("due","");if(!v)return null;const due=new Date(v+"T00:00:00"),today=new Date(dayKey(Date.now())+"T00:00:00");
+ const left=Math.round((due-today)/DAY),days=280-left;return {left,w:Math.floor(days/7),d:days%7}}
+function renderPreg(){const p=pregWeek(),el=$("pregCard");if(!p){el.innerHTML='<p class="muted">Nhập ngày dự sinh để xem bé đang lớn thế nào và nhận gợi ý nhạc theo từng giai đoạn.</p>';return}
+ if(p.left<0){el.innerHTML=`<h3>🎉 Chúc mừng mẹ đã gặp con!</h3><p class="muted">Đã qua ngày dự sinh ${-p.left} ngày. Mục <b>👶 Sau sinh</b> có tiếng ồn trắng, tiếng suỵt và âm thanh trong bụng mẹ giúp bé dễ ngủ.</p><button class="btn" id="pgo">Mở nhạc sau sinh</button>`;
+  $("pgo").onclick=()=>{catSel="baby";pl=null;show("listen");render()};return}
+ if(p.w<1||p.left>280){el.innerHTML='<p class="muted">Ngày dự sinh có vẻ chưa đúng, mẹ kiểm tra lại giúp nhé.</p>';return}
+ const st=STAGES.find(s=>p.w>=s[0]&&p.w<=s[1])||STAGES[4],size=SIZES[Math.min(40,Math.max(4,p.w))];
+ el.innerHTML=`<div class="week"><div class="num">${p.w}</div><div><b>tuần ${p.d?"+ "+p.d+" ngày":""}</b><div class="muted">Còn ${p.left} ngày nữa gặp con</div></div></div>
+  <div class="meter"><i style="width:${Math.min(100,(280-p.left)/2.8)}%"></i></div><div class="muted">${Math.round((280-p.left)/2.8)}% hành trình 40 tuần</div>
+  <p style="margin:12px 0 4px">${p.w>=4?`Bé to cỡ <b>${size}</b>.`:"Bé vừa mới bắt đầu hành trình."}</p>
+  <p style="margin:4px 0"><b>${st[2]}:</b> ${st[3]}</p>
+  <button class="btn" id="pgo" style="margin-top:8px">Nghe ${CATS[st[4]].n}</button>`;
+ $("pgo").onclick=()=>{catSel=st[4];pl=null;show("listen");render();play(queue()[0])}}
+
+// ===== Giọng mẹ (lưu trong bộ nhớ của trình duyệt) =====
+const idb=new Promise((res,rej)=>{try{const r=indexedDB.open("mybaby",1);r.onupgradeneeded=()=>r.result.createObjectStore("recs",{keyPath:"id"});r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}});
+const recTx=async(mode,fn)=>{const db=await idb;return new Promise((res,rej)=>{const t=db.transaction("recs",mode),s=t.objectStore("recs"),r=fn(s);t.oncomplete=()=>res(r&&r.result);t.onerror=()=>rej(t.error)})};
+let recorder=null,chunks=[],recStart=0,recAudio=null;
+$("recBtn").onclick=async()=>{
+ if(recorder){recorder.stop();return}
+ if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){$("recMsg").textContent="Trình duyệt này chưa hỗ trợ ghi âm. Mẹ mở ứng dụng bằng Chrome hoặc Safari bản mới nhé.";return}
+ let stream;try{stream=await navigator.mediaDevices.getUserMedia({audio:true})}catch(e){$("recMsg").textContent="Chưa được phép dùng micro. Mẹ bấm “Cho phép” khi trình duyệt hỏi, hoặc mở ứng dụng ở link GitHub để thu âm.";return}
+ chunks=[];recorder=new MediaRecorder(stream);recorder.ondataavailable=e=>chunks.push(e.data);
+ recorder.onstop=async()=>{stream.getTracks().forEach(t=>t.stop());const blob=new Blob(chunks,{type:recorder.mimeType||"audio/webm"}),sec=Math.round((Date.now()-recStart)/1000);recorder=null;
+  $("recBtn").textContent="⏺ Bắt đầu thu";$("recMsg").textContent="";
+  const name=$("recName").value.trim()||"Giọng mẹ "+new Date().toLocaleDateString("vi-VN");
+  try{await recTx("readwrite",s=>s.put({id:Date.now(),name,sec,blob,date:Date.now()}));$("recName").value="";renderRecs()}catch(e){$("recMsg").textContent="Không lưu được bản ghi trên máy này."}};
+ recorder.start();recStart=Date.now();$("recBtn").textContent="⏹ Dừng và lưu";
+ const tick=()=>{if(!recorder)return;$("recMsg").innerHTML=`<span class="dot"></span> Đang thu… ${fmt((Date.now()-recStart)/1000)}`;setTimeout(tick,500)};tick()};
+async function renderRecs(){let recs=[];try{recs=await recTx("readonly",s=>s.getAll())}catch(e){}
+ $("recList").innerHTML=recs.length?recs.sort((a,b)=>b.date-a.date).map(r=>`<div class="rec" data-id="${r.id}"><button class="ib big" data-a="play" aria-label="Phát">▶</button><div class="info" style="flex:1;min-width:0"><div class="t">${r.name.replace(/</g,"&lt;")}</div><div class="s">${new Date(r.date).toLocaleDateString("vi-VN")} · ${fmt(r.sec)}</div></div><button class="ib" data-a="del" aria-label="Xóa">🗑</button></div>`).join(""):'<p class="muted">Chưa có bản ghi nào.</p>'}
+$("recList").onclick=async e=>{const b=e.target.closest("button"),row=e.target.closest(".rec");if(!b||!row)return;const id=+row.dataset.id;
+ if(b.dataset.a==="del"){if(b.dataset.sure){await recTx("readwrite",s=>s.delete(id));renderRecs()}else{b.dataset.sure=1;b.textContent="Xóa?";b.style.width="auto";setTimeout(()=>renderRecs(),3000)}return}
+ if(recAudio&&recAudio.dataset.id==id&&!recAudio.paused){recAudio.pause();b.textContent="▶";return}
+ const r=await recTx("readonly",s=>s.get(id));if(out){stop();ui()}
+ if(recAudio)recAudio.pause();recAudio=new Audio(URL.createObjectURL(r.blob));recAudio.dataset.id=id;recAudio.volume=+$("vol").value;
+ document.querySelectorAll("#recList [data-a=play]").forEach(x=>x.textContent="▶");b.textContent="⏸";recAudio.onended=()=>b.textContent="▶";recAudio.play();logStart=Date.now()};
+
+// ===== Giọng đọc tiếng Việt =====
+function speak(text,rate=.9){if(!("speechSynthesis" in window))return false;speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);
+ const v=speechSynthesis.getVoices().find(v=>/^vi/i.test(v.lang));if(v)u.voice=v;u.lang="vi-VN";u.rate=rate;speechSynthesis.speak(u);return true}
+if("speechSynthesis" in window)speechSynthesis.getVoices();
+
+// ===== Bài tập thở =====
+let bTimer=null;
+function stopBreath(){clearTimeout(bTimer);bTimer=null;$("bStart").textContent="Bắt đầu";$("circle").textContent="Sẵn sàng";$("circle").style.transform="scale(1)";$("bLeft").textContent="";if("speechSynthesis" in window)speechSynthesis.cancel()}
+$("bStart").onclick=()=>{if(bTimer){stopBreath();return}
+ const pat=$("bPat").value.split(",").map(Number),end=Date.now()+ +$("bDur").value*60000,voice=$("bVoice").checked;
+ const phases=pat.length===4?[["Hít vào",1.6],["Giữ hơi",1.6],["Thở ra",1],["Nghỉ",1]]:[["Hít vào",1.6],["Giữ hơi",1.6],["Thở ra",1]];
+ let i=0;$("bStart").textContent="Dừng";
+ const run=()=>{if(Date.now()>=end){stopBreath();$("circle").textContent="Hoàn thành 🌸";if(voice)speak("Mẹ làm tốt lắm. Hãy thả lỏng và cảm nhận bé nhé.");return}
+  const k=i%phases.length,sec=pat[k];i++;if(!sec){run();return}
+  const [label,scale]=phases[k];$("circle").textContent=label;$("circle").style.transitionDuration=sec+"s";$("circle").style.transform=`scale(${scale})`;
+  if(voice)speak(label);$("bLeft").textContent="còn "+fmt((end-Date.now())/1000);bTimer=setTimeout(run,sec*1000)};
+ if(voice)speak("Mẹ ngồi thoải mái, đặt tay lên bụng, và cùng thở theo vòng tròn nhé.");bTimer=setTimeout(run,voice?3500:500)};
+
+// ===== Truyện =====
+$("stories").innerHTML=STORIES.map((s,i)=>`<details class="story" data-i="${i}"><summary>📖 ${s.t}</summary>${s.p.map(p=>`<p>${p}</p>`).join("")}<button class="btn ghost" data-read>🔊 Nghe đọc</button> <span class="muted" data-msg></span></details>`).join("");
+$("stories").onclick=e=>{const b=e.target.closest("[data-read]");if(!b)return;const d=b.closest("details"),s=STORIES[d.dataset.i];
+ if(b.dataset.on){speechSynthesis.cancel();delete b.dataset.on;b.textContent="🔊 Nghe đọc";return}
+ if(!speak(s.t+". "+s.p.join(" "),.85)){d.querySelector("[data-msg]").textContent="Máy chưa có giọng đọc, mẹ đọc to cho bé nghe nhé.";return}
+ if(!speechSynthesis.getVoices().some(v=>/^vi/i.test(v.lang)))d.querySelector("[data-msg]").textContent="Máy chưa cài giọng tiếng Việt nên giọng đọc có thể chưa chuẩn.";
+ b.dataset.on=1;b.textContent="⏹ Dừng đọc"};
+
+// ===== Nhật ký: tự cộng thời gian nghe =====
+let log=store.get("log",{}),logStart=0,lastSave=Date.now();
+setInterval(()=>{const playing=!!out||(recAudio&&!recAudio.paused);if(!playing)return;const k=dayKey(Date.now());
+ log[k]=log[k]||{s:0};log[k].s+=1;if(Date.now()-lastSave>10000){store.set("log",log);lastSave=Date.now()}
+ if(!$("v-diary").hidden&&log[k].s%10===0)renderDiary()},1000);
+addEventListener("pagehide",()=>store.set("log",log));
+function streak(){let n=0,d=Date.now();if(!(log[dayKey(d)]?.s>=60))d-=DAY;while(log[dayKey(d)]?.s>=60){n++;d-=DAY}return n}
+function renderDiary(){const k=dayKey(Date.now());
+ $("dToday").textContent=Math.floor((log[k]?.s||0)/60);$("dStreak").textContent=streak();
+ $("dTotal").textContent=(Object.values(log).reduce((a,v)=>a+(v.s||0),0)/3600).toFixed(1);
+ const days=[...Array(7)].map((_,i)=>Date.now()-(6-i)*DAY),mins=days.map(d=>Math.floor((log[dayKey(d)]?.s||0)/60)),mx=Math.max(30,...mins);
+ $("dBars").innerHTML=days.map((d,i)=>`<div><span>${mins[i]}</span><i style="height:${mins[i]/mx*60}px"></i><span>${i===6?"Nay":["CN","T2","T3","T4","T5","T6","T7"][new Date(d).getDay()]}</span></div>`).join("");
+ if(document.activeElement!==$("dNote"))$("dNote").value=log[k]?.note||"";
+ const hist=Object.entries(log).filter(([d,v])=>v.note&&d!==k).sort((a,b)=>a[0]<b[0]?1:-1).slice(0,30);
+ $("dHist").innerHTML=hist.length?hist.map(([d,v])=>`<p style="margin:6px 0"><b>${d.split("-").reverse().join("/")}</b> · ${Math.floor(v.s/60)} phút<br>${v.note.replace(/</g,"&lt;")}</p>`).join(""):"Chưa có ghi chú."}
+let noteT;$("dNote").oninput=()=>{clearTimeout(noteT);noteT=setTimeout(()=>{const k=dayKey(Date.now());log[k]=log[k]||{s:0};log[k].note=$("dNote").value;store.set("log",log);$("dSaved").textContent="Đã lưu ✓"},600)};
+
 greet();render();
 </script>
 

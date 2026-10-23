@@ -1,6 +1,6 @@
 # Mybaby – Nhạc Thai Giáo
 
-Ứng dụng nghe nhạc thai giáo cho mẹ bầu: thiên nhiên, thư giãn, hòa tấu, giao hưởng, ru con, vui tươi. Có hẹn giờ tắt và gợi ý nghe theo thời điểm trong ngày.
+Ứng dụng nghe nhạc thai giáo cho mẹ bầu: 64 bài (thiên nhiên, thư giãn, hòa tấu, giao hưởng, ru con, vui tươi, sau sinh), bộ nhạc theo buổi, theo dõi tuần thai, thu giọng mẹ, truyện thai giáo, bài tập thở có giọng hướng dẫn và nhật ký thai giáo.
 
 Mở ứng dụng: https://lemyx1997.github.io/mybaby/
 
