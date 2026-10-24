@@ -1,5 +1,5 @@
 // Giúp ứng dụng mở được khi không có mạng: lưu sẵn phần chính, bản nhạc nào đã nghe thì lưu lại để lần sau nghe offline.
-const CORE = 'mybaby-core-v4', MUSIC = 'mybaby-nhac-v1';
+const CORE = 'mybaby-core-v5', MUSIC = 'mybaby-nhac-v1';
 const FILES = ['./', 'index.html', 'manifest.json', 'icon-192.png', 'icon-512.png'];
 
 self.addEventListener('install', e => {

@@ -47,3 +47,5 @@ Thêm 30 bản thu (nguồn Wikimedia Commons, tên tác giả/nghệ sĩ và gi
 - Rondo vui tươi – Mozart – Eine kleine Nachtmusik, Public domain
 
 Giọng đọc truyện và bài tập thở (thư mục voice/): giọng tiếng Việt Hoài My (Microsoft), tạo sẵn thành file mp3.
+
+Mục Nuôi bé (0–2 tuổi) tổng hợp từ khuyến nghị của WHO, UNICEF Việt Nam, Viện Hàn lâm Nhi khoa Hoa Kỳ (AAP), CDC Hoa Kỳ và Chương trình Tiêm chủng mở rộng của Bộ Y tế. Chỉ để tham khảo, không thay thế lời khuyên của bác sĩ.

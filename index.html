@@ -12,10 +12,10 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap">
 <style>
 /* Bố cục: thanh đầu dính trên cùng (tên + gợi ý giờ + tìm + thể loại), danh sách bài dạng hàng gọn, trình phát nhỏ dính dưới đáy */
-:root{--bg:#fbf5f3;--card:#fff;--ink:#43343f;--muted:#8f7f8a;--accent:#d9708f;--accent-soft:#f8e1e8;--line:#efe2e5;--sage:#7fa58e;
+:root{--bg:#fbf5f3;--card:#fff;--ink:#43343f;--muted:#8f7f8a;--accent:#d9708f;--accent-soft:#f8e1e8;--line:#efe2e5;--sage:#7fa58e;--danger:#c2364c;
  --f:"Be Vietnam Pro",system-ui,"Segoe UI",sans-serif}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d181d;--card:#28212a;--ink:#f2e7ec;--muted:#a594a1;--accent:#ec8fab;--accent-soft:#40283a;--line:#372d38;--sage:#97c2a6;color-scheme:dark}}
-:root[data-theme="dark"]{--bg:#1d181d;--card:#28212a;--ink:#f2e7ec;--muted:#a594a1;--accent:#ec8fab;--accent-soft:#40283a;--line:#372d38;--sage:#97c2a6;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d181d;--card:#28212a;--ink:#f2e7ec;--muted:#a594a1;--accent:#ec8fab;--accent-soft:#40283a;--line:#372d38;--sage:#97c2a6;--danger:#f08a9a;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#1d181d;--card:#28212a;--ink:#f2e7ec;--muted:#a594a1;--accent:#ec8fab;--accent-soft:#40283a;--line:#372d38;--sage:#97c2a6;--danger:#f08a9a;color-scheme:dark}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 var(--f);padding-bottom:150px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
@@ -103,13 +103,25 @@ textarea.field{width:100%;min-height:70px;resize:vertical}
 .story p{margin:8px 0;line-height:1.6}
 .dot{width:10px;height:10px;border-radius:50%;background:#e04a5f;display:inline-block;animation:blink 1s infinite}
 @keyframes blink{50%{opacity:.2}}
+.danger{border-color:var(--danger)}
+.danger h3{color:var(--danger)}
+.danger ul,.stage ul,.src{margin:4px 0;padding-left:18px;font-size:14px}
+.danger li,.stage li{margin:4px 0;line-height:1.5}
+.stage{margin:0 0 8px;padding:0;overflow:hidden}
+.stage summary{padding:12px 14px;display:flex;align-items:center;gap:10px;list-style:none}
+.stage summary::-webkit-details-marker{display:none}
+.stage summary .age{font-size:12px;color:var(--muted);font-weight:400}
+.stage summary .now{flex:none;font-size:11px;background:var(--accent);color:#fff;padding:2px 8px;border-radius:999px;font-weight:500}
+.stage .body{padding:0 14px 12px}
+.stage h4{margin:10px 0 2px;font-size:14px;color:var(--accent)}
+.stage.cur{border-color:var(--accent)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <header><div class="wrap">
  <div class="top"><h1>Mybaby <span>· nhạc thai giáo</span></h1></div>
  <div class="hello" id="hello"></div>
  <nav class="nav" id="nav">
-  <button data-v="listen" class="on">🎵 Nghe</button><button data-v="preg">🤰 Thai kỳ</button><button data-v="voice">🎙️ Giọng mẹ</button><button data-v="story">📖 Truyện & thở</button><button data-v="diary">📔 Nhật ký</button>
+  <button data-v="listen" class="on">🎵 Nghe</button><button data-v="preg">🤰 Thai kỳ</button><button data-v="voice">🎙️ Giọng mẹ</button><button data-v="story">📖 Truyện & thở</button><button data-v="diary">📔 Nhật ký</button><button data-v="baby">👶 Nuôi bé</button>
  </nav>
  <div id="listenHead">
  <input class="search" id="q" type="search" placeholder="Tìm bài: Mozart, mưa, ru con…">
@@ -186,6 +198,40 @@ textarea.field{width:100%;min-height:70px;resize:vertical}
   <p class="muted" id="dSaved" style="margin:4px 0 0"></p>
  </div>
  <div class="card"><h3>Những ngày trước</h3><div id="dHist" class="muted">Chưa có ghi chú.</div></div>
+</main>
+
+<main class="wrap" id="v-baby" hidden>
+ <div class="card">
+  <h3>Hành trình lớn lên của bé</h3>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center"><label class="muted" for="birth">Ngày sinh của bé</label><input class="field" type="date" id="birth"></div>
+  <p class="muted" id="ageMsg" style="margin:8px 0 0">Nhập ngày sinh để ứng dụng mở đúng giai đoạn của bé. Chưa sinh thì mẹ cứ xem trước để chuẩn bị nhé.</p>
+ </div>
+ <div class="card danger">
+  <h3>🚨 Đưa bé đi khám ngay khi thấy</h3>
+  <ul>
+   <li>Bé dưới 3 tháng bị <b>sốt từ 38°C</b> trở lên (đo ở hậu môn), hoặc người lạnh bất thường.</li>
+   <li>Bé bỏ bú, bú rất yếu, hoặc nôn hết mọi thứ.</li>
+   <li>Thở nhanh, thở rút lõm lồng ngực, thở rên, môi tím tái.</li>
+   <li>Co giật, li bì, khó đánh thức, mềm nhũn.</li>
+   <li>Vàng da xuất hiện trong 24 giờ đầu, vàng lan xuống lòng bàn tay, bàn chân.</li>
+   <li>Rốn sưng đỏ, chảy mủ, có mùi hôi.</li>
+   <li>Ít tã ướt (dưới 6 tã/ngày sau tuần đầu), phân có máu hoặc trắng bạc màu.</li>
+  </ul>
+  <p class="muted" style="margin:6px 0 0">Theo hướng dẫn chăm sóc trẻ bệnh của WHO và AAP. Gọi cấp cứu <b>115</b> khi bé khó thở hoặc co giật.</p>
+ </div>
+ <div class="sec-t">Lộ trình theo tuổi của bé · bấm từng giai đoạn để xem</div>
+ <div id="stages"></div>
+ <div class="card">
+  <h3>Nguồn tham khảo</h3>
+  <ul class="muted src">
+   <li>Tổ chức Y tế Thế giới (WHO): nuôi con bằng sữa mẹ, ăn dặm, chăm sóc trẻ sơ sinh, dấu hiệu nguy hiểm.</li>
+   <li>UNICEF Việt Nam: lịch tiêm chủng và vắc-xin Rota trong Chương trình Tiêm chủng mở rộng.</li>
+   <li>Viện Hàn lâm Nhi khoa Hoa Kỳ (AAP – HealthyChildren.org): ngủ an toàn, vitamin D, sốt ở trẻ nhỏ.</li>
+   <li>CDC Hoa Kỳ – chương trình “Learn the Signs. Act Early.”: các mốc phát triển (bản cập nhật 2022).</li>
+   <li>Bộ Y tế Việt Nam – Viện Vệ sinh Dịch tễ Trung ương: Chương trình Tiêm chủng mở rộng.</li>
+  </ul>
+  <p class="muted" style="margin:6px 0 0">Thông tin chỉ để tham khảo, không thay thế lời khuyên của bác sĩ. Mỗi bé phát triển theo nhịp riêng. Lịch tiêm có thể khác nhau theo địa phương, bố mẹ hãy hỏi trạm y tế phường/xã.</p>
+ </div>
 </main>
 
 <div class="player"><div class="wrap">
@@ -316,6 +362,75 @@ const STORIES=[
  {t:"Gấu con đi ngủ",p:["Trời đã tối, khu rừng dần yên ắng. Gấu con dụi mắt, ngáp một cái thật to.","Gấu mẹ trải chiếc chăn lá mềm, hát một bài ru thật khẽ: “À ơi, con ngủ cho ngoan…”","Ngoài kia, đom đóm thắp đèn, dế mèn kéo đàn, gió đung đưa cành lá như đang ru cả khu rừng.","Gấu con nắm tay mẹ, mỉm cười và chìm vào giấc ngủ thật sâu. Ngủ ngoan nhé con yêu, mẹ luôn ở đây."]},
  {t:"Lời mẹ gửi con",p:["Con yêu của mẹ, từ ngày biết có con, mỗi sáng thức dậy mẹ đều thấy lòng mình ấm áp hơn.","Mẹ tưởng tượng đôi mắt con, nụ cười con, bàn tay bé xíu của con nắm lấy ngón tay mẹ.","Mẹ hứa sẽ luôn yêu thương con, đọc truyện cho con nghe, hát ru con mỗi tối và cùng con khám phá thế giới.","Con cứ lớn lên bình an trong bụng mẹ nhé. Cả nhà đang chờ đón con từng ngày."]}
 ];
+
+// Hướng dẫn nuôi bé theo tuổi (tổng hợp từ WHO, UNICEF, AAP, CDC, Bộ Y tế). from/to tính bằng ngày tuổi.
+const H={dev:"🌱 Mốc phát triển",eat:"🍼 Ăn uống",sleep:"😴 Giấc ngủ",care:"🛁 Chăm sóc & sức khỏe",vac:"💉 Tiêm chủng",play:"🧸 Chơi cùng bé"};
+const BABY=[
+ {n:"Tuần đầu tiên",age:"0–7 ngày",from:0,to:7,
+  eat:["Cho bé bú mẹ trong vòng 1 giờ đầu sau sinh. Sữa non vàng sánh tuy ít nhưng rất quý, đủ cho bé.","Bú theo nhu cầu, thường 8–12 lần/ngày, kể cả ban đêm. Dấu hiệu đói: mút tay, quay đầu tìm vú; khóc là dấu hiệu muộn.","Không cho bé uống nước, nước đường, mật ong hay sữa ngoài khi chưa có chỉ định của bác sĩ."],
+  sleep:["Bé ngủ khoảng 14–17 giờ/ngày, chia thành nhiều giấc ngắn.","Luôn đặt bé <b>nằm ngửa</b> khi ngủ, trên mặt phẳng chắc. Không để gối, chăn dày, thú bông trong chỗ bé nằm.","Nên cho bé ngủ cùng phòng nhưng nằm riêng giường/nôi để giảm nguy cơ đột tử."],
+  care:["Bé thường được tiêm vitamin K ngay sau sinh để phòng xuất huyết.","Giữ cuống rốn <b>khô, sạch</b>, không bôi thuốc, không băng kín. Rốn thường rụng sau 1–3 tuần.","Da kề da (bế bé áp ngực trần của mẹ/bố) giúp bé ấm, ổn định nhịp tim và bú tốt hơn.","Vàng da nhẹ từ ngày 2–3 là thường gặp. Đưa bé đi khám nếu vàng trong 24 giờ đầu, vàng đậm hoặc lan xuống tay chân.","Ngày 3–4 bé nên có ít nhất 3–4 tã ướt; phân su đen chuyển dần sang vàng."],
+  vac:["Viêm gan B mũi sơ sinh: trong vòng 24 giờ đầu sau sinh.","Lao (BCG): càng sớm càng tốt, trong tháng đầu."],
+  play:["Nói chuyện, hát ru nhẹ nhàng. Bé đã quen giọng mẹ từ trong bụng, nên những bản nhạc mẹ nghe khi mang thai sẽ giúp bé dễ chịu.","Bé nhìn rõ nhất ở khoảng cách 20–30 cm, đúng bằng khoảng cách từ ngực lên mặt mẹ khi bú."]},
+ {n:"Tháng đầu tiên",age:"1–4 tuần",from:8,to:30,
+  dev:["Bé giật mình với tiếng động lớn, nắm chặt ngón tay khi chạm vào lòng bàn tay.","Bé bắt đầu nhìn theo mặt người ở gần."],
+  eat:["Tiếp tục bú mẹ hoàn toàn theo nhu cầu. Bé bú đủ khi có khoảng 6 tã ướt/ngày và tăng cân đều.","Bé thường lấy lại cân nặng lúc sinh khi được khoảng 10–14 ngày tuổi.","Bé bú mẹ hoàn toàn nên được bổ sung vitamin D 400 IU/ngày theo khuyến nghị của AAP (hỏi bác sĩ trước khi dùng)."],
+  sleep:["Bé chưa phân biệt ngày đêm. Ban ngày để phòng sáng tự nhiên, ban đêm giữ tối và yên tĩnh khi cho bú.","Quấn chũn có thể giúp bé ngủ yên, nhưng dừng quấn khi bé bắt đầu tập lẫy."],
+  care:["Tắm lau bằng khăn ấm cho đến khi rụng rốn, sau đó có thể tắm chậu, 2–3 lần/tuần là đủ.","Cắt móng tay khi bé ngủ để bé không cào xước mặt.","Bé dưới 3 tháng sốt từ 38°C là cần đi khám ngay, không tự cho uống thuốc hạ sốt.","Khóc nhiều vào chiều tối là bình thường ở tuần 2–6. Bế, ru, cho nghe tiếng ồn trắng trong mục 👶 Sau sinh có thể giúp bé dịu lại."],
+  vac:["Hoàn thành BCG nếu chưa tiêm.","Chuẩn bị lịch tiêm lúc 2 tháng."],
+  play:["Cho bé nằm sấp chơi vài phút mỗi lần, vài lần/ngày khi bé thức và có người trông, giúp cổ và vai khỏe.","Treo đồ chơi tương phản đen – trắng, đỏ cho bé nhìn."]},
+ {n:"2 tháng",age:"1–3 tháng",from:31,to:105,
+  dev:["Bé <b>mỉm cười</b> khi được nói chuyện, nhìn mặt bố mẹ.","Bé ê a, quay đầu về phía có tiếng động.","Khi nằm sấp, bé ngẩng được đầu.","Bé mở bàn tay, đưa tay lên miệng."],
+  eat:["Vẫn bú mẹ hoàn toàn. Chưa cho ăn bột, nước hay bất kỳ thức ăn nào khác.","Mẹ đi làm có thể vắt sữa trữ: để ngăn mát tủ lạnh dùng trong 4 ngày, ngăn đá dùng trong khoảng 6 tháng."],
+  sleep:["Bé bắt đầu có giấc đêm dài hơn, khoảng 3–4 tiếng.","Tạo thói quen trước khi ngủ: tắm, thay đồ, bật một bản ru quen thuộc."],
+  care:["Khám sức khỏe định kỳ, theo dõi cân nặng, chiều dài theo biểu đồ tăng trưởng.","Rửa tay trước khi bế bé, hạn chế người ốm đến gần."],
+  vac:["Lúc 2 tháng: 5 trong 1 (bạch hầu – ho gà – uốn ván – viêm gan B – Hib) mũi 1 và bại liệt uống (OPV) lần 1.","Vắc-xin Rota uống liều 1 (nếu địa phương đã triển khai miễn phí trong Tiêm chủng mở rộng, hoặc tiêm dịch vụ).","Lúc 3 tháng: 5 trong 1 mũi 2, OPV lần 2, Rota liều 2 (cách liều 1 ít nhất 1 tháng)."],
+  play:["Bắt chước tiếng ê a của bé để bé “trò chuyện” lại.","Đọc truyện, hát cho bé nghe; bé thích giọng nói cao, chậm và vui vẻ."]},
+ {n:"4 tháng",age:"4–5 tháng",from:106,to:165,
+  dev:["Bé giữ đầu vững không cần đỡ.","Bé cười thành tiếng, ê a đáp lại khi được nói chuyện.","Bé với lấy đồ chơi, đưa đồ vật vào miệng.","Khi nằm sấp, bé chống khuỷu tay nâng ngực lên. Một số bé bắt đầu lẫy."],
+  eat:["Vẫn bú mẹ hoàn toàn đến tròn 6 tháng theo khuyến nghị của WHO.","Bé hay chảy dãi, gặm tay là bình thường, chưa phải dấu hiệu cần ăn dặm."],
+  sleep:["Tổng giấc ngủ khoảng 12–16 giờ/ngày (tính cả giấc ngày).","Có thể có giai đoạn ngủ xáo trộn quanh 4 tháng, sẽ qua sau vài tuần."],
+  care:["Bé bắt đầu lật: không để bé một mình trên giường, sofa hay bàn thay tã.","Để các vật nhỏ, túi ni-lông, dây điện xa tầm tay bé."],
+  vac:["Lúc 4 tháng: 5 trong 1 mũi 3 và OPV lần 3.","Bại liệt tiêm (IPV) mũi 1 thường vào khoảng 5 tháng tuổi; hỏi trạm y tế để có lịch chính xác."],
+  play:["Cho bé soi gương, chơi ú òa.","Đưa đồ chơi có tiếng kêu, màu sắc khác nhau để bé cầm nắm."]},
+ {n:"6 tháng",age:"6–8 tháng",from:166,to:255,
+  dev:["Bé lẫy được từ sấp sang ngửa, có thể ngồi khi được đỡ.","Bé nhận ra người quen, có thể bắt đầu lạ người.","Bé phát âm các âm như “ba ba”, “ma ma”, cười khi được chơi."],
+  eat:["Bắt đầu <b>ăn dặm từ tròn 6 tháng</b> và tiếp tục bú mẹ đến 2 tuổi hoặc lâu hơn (WHO).","Bắt đầu bằng cháo/bột loãng, tăng dần độ đặc. Thêm dần rau xanh, thịt, cá, trứng, đậu nghiền để đủ chất đạm và sắt.","Mỗi lần thử một món mới và theo dõi 2–3 ngày. Không thêm muối, đường, nước mắm vào đồ ăn của bé.","<b>Không cho bé ăn mật ong trước 12 tháng</b> (nguy cơ ngộ độc).","Từ khi ăn dặm có thể cho bé uống vài ngụm nước chín bằng cốc."],
+  sleep:["Bé thường ngủ 2–3 giấc ngày. Nhiều bé đã ngủ được giấc đêm dài.","Không cho bé ngậm bình sữa khi ngủ để tránh sâu răng."],
+  care:["Chiếc răng đầu tiên có thể mọc từ 6 tháng. Dùng gạc hoặc bàn chải mềm làm sạch răng với một lượng kem đánh răng có fluor nhỏ bằng hạt gạo.","Luôn có người lớn ngồi cùng khi bé ăn, cho bé ngồi thẳng để tránh hóc.","Bắt đầu chặn cầu thang, che ổ điện vì bé sắp bò."],
+  vac:["Hoàn thành các mũi của tháng 2, 3, 4 nếu bị trễ.","Ngoài chương trình miễn phí có thể hỏi bác sĩ về tiêm cúm (từ 6 tháng)."],
+  play:["Cho bé ngồi chơi với đồ chơi xếp chồng, lắc tạo tiếng.","Gọi tên đồ vật khi đưa cho bé: “Đây là quả bóng”."]},
+ {n:"9 tháng",age:"9–11 tháng",from:256,to:350,
+  dev:["Bé <b>tự ngồi vững</b>, bò, có thể vịn đứng.","Bé quay lại khi được gọi tên, hiểu chữ “không”.","Bé chuyển đồ vật từ tay này sang tay kia, dùng ngón cái và ngón trỏ nhặt đồ nhỏ.","Bé sợ người lạ, bám mẹ, tìm đồ vật bị giấu."],
+  eat:["Ăn 3–4 bữa chính và phụ mỗi ngày, vẫn bú mẹ.","Chuyển dần sang cháo đặc, thức ăn băm nhỏ, cho bé tự cầm miếng mềm để tập nhai.","Tránh thức ăn dễ hóc: hạt nguyên, nho nguyên quả, kẹo cứng, xương cá."],
+  sleep:["Khoảng 12–15 giờ/ngày, 2 giấc ngày.","Bé có thể thức đêm khi tập bò, tập đứng hoặc mọc răng; giữ nếp ngủ đều đặn."],
+  care:["Giữ hóa chất, thuốc, đồ sắc nhọn ở trên cao hoặc trong tủ khóa.","Không để bé ở gần chậu, xô nước, ao hồ. Trẻ có thể đuối nước trong chậu nước rất nông."],
+  vac:["Lúc 9 tháng: <b>Sởi mũi 1</b>.","IPV mũi 2 (từ 9 tháng tuổi) theo Chương trình Tiêm chủng mở rộng."],
+  play:["Chơi trốn tìm, lăn bóng qua lại.","Đọc sách tranh, chỉ vào hình và gọi tên con vật."]},
+ {n:"12 tháng",age:"1 tuổi",from:351,to:440,
+  dev:["Bé vịn đồ đi men, một số bé bắt đầu chập chững tự đi.","Bé vẫy tay tạm biệt, gọi “ba”, “mẹ” có chủ đích.","Bé uống nước bằng cốc có người giữ, nhặt đồ bằng hai ngón tay."],
+  eat:["Bé ăn cùng bữa với gia đình, thức ăn cắt nhỏ, mềm, ít muối.","Từ 12 tháng có thể cho uống sữa tươi nguyên kem; vẫn khuyến khích bú mẹ đến 2 tuổi.","Hạn chế nước ngọt, nước ép đóng hộp, bánh kẹo."],
+  sleep:["Khoảng 11–14 giờ/ngày, có thể chuyển dần từ 2 giấc ngày xuống 1 giấc."],
+  care:["Khám răng lần đầu khi bé mọc răng hoặc khoảng 1 tuổi.","Không cho bé xem màn hình (TV, điện thoại) trước 18–24 tháng, trừ gọi video với người thân."],
+  vac:["Viêm não Nhật Bản: từ 1 tuổi, 2 mũi cách nhau 1–2 tuần, mũi 3 sau 1 năm.","Hỏi bác sĩ về các vắc-xin dịch vụ như thủy đậu, viêm gan A, sởi – quai bị – rubella."],
+  play:["Cho bé đẩy xe tập đi, xếp hình khối, vẽ nguệch ngoạc bằng bút sáp to.","Nói chuyện với bé thật nhiều, gọi tên mọi thứ xung quanh."]},
+ {n:"18 tháng",age:"15–23 tháng",from:441,to:700,
+  dev:["Khoảng 15 tháng bé tự đi vài bước; đến 18 tháng bé đi vững.","Bé nói được ít nhất 3 từ ngoài “ba, mẹ”, chỉ tay vào thứ mình muốn.","Bé tự xúc ăn bằng thìa (còn vương vãi), bắt chước việc nhà."],
+  eat:["Bé ăn 3 bữa chính và 2 bữa phụ, đủ 4 nhóm chất: tinh bột, đạm, chất béo, rau quả.","Bé có thể kén ăn từng giai đoạn: cứ tiếp tục cho thử, không ép, không dỗ bằng điện thoại."],
+  sleep:["Khoảng 11–14 giờ/ngày, thường 1 giấc trưa."],
+  care:["Đánh răng 2 lần/ngày.","Trẻ hay ngã khi tập đi: bọc góc bàn, chặn cầu thang, cửa sổ."],
+  vac:["Lúc 18 tháng: nhắc lại bạch hầu – ho gà – uốn ván (DPT) và sởi – rubella (MR) trong Tiêm chủng mở rộng."],
+  play:["Đọc sách cùng bé mỗi ngày, hỏi “Con mèo đâu?”.","Cho bé chơi ngoài trời, nghe nhạc và nhún nhảy theo những bài vui tươi."]},
+ {n:"2 tuổi",age:"24 tháng",from:701,to:900,
+  dev:["Bé chạy, đá bóng, leo lên ghế.","Bé nói câu 2 từ như “mẹ bế”, “uống nước”; chỉ được các bộ phận cơ thể.","Bé chơi cạnh các bạn, bắt chước người lớn."],
+  eat:["Ăn cùng gia đình, tập tự ăn và dùng cốc.","Chuyển sang sữa ít béo nếu bác sĩ khuyên; hạn chế đồ ngọt, đồ chiên."],
+  sleep:["Khoảng 11–14 giờ/ngày, giữ giờ đi ngủ cố định."],
+  care:["Có thể bắt đầu tập đi bô khi bé sẵn sàng: biết báo, giữ tã khô được 2 tiếng.","Thời gian xem màn hình nếu có thì dưới 1 giờ/ngày, có bố mẹ xem cùng."],
+  vac:["Kiểm tra sổ tiêm chủng, bổ sung các mũi còn thiếu."],
+  play:["Chơi đóng vai, xếp hình, tô màu.","Hát và vận động theo nhạc; kể chuyện trước giờ ngủ."]}
+];
+// Dấu hiệu nên hỏi bác sĩ sớm theo từng giai đoạn (CDC – Learn the Signs. Act Early.)
+const FLAGS={2:"Đến khoảng 2 tháng mà bé chưa mỉm cười với người, không phản ứng với tiếng động lớn.",3:"Đến 4 tháng mà bé chưa giữ được đầu, không nhìn theo đồ vật.",4:"Đến 6 tháng bé chưa với lấy đồ vật, không cười thành tiếng, người quá mềm hoặc quá cứng.",5:"Đến 9 tháng bé chưa ngồi được khi có người giúp, không phản ứng khi được gọi tên.",6:"Đến 12 tháng bé chưa bò, không chỉ tay, không nói được từ nào, mất kỹ năng đã có.",7:"Đến 18 tháng bé chưa tự đi, không nói được vài từ, không bắt chước người khác.",8:"Đến 2 tuổi bé chưa nói câu 2 từ, không làm theo yêu cầu đơn giản, mất kỹ năng đã có."};
 
 let ctx,master,cur=null,stopFns=[],timers=[],catSel="all",endAt=0,audioEl=null,autoNext=null;
 const MODES=[["next","➡️ Phát tiếp"],["one","🔂 Lặp 1 bài"],["shuffle","🔀 Ngẫu nhiên"]];
@@ -455,8 +570,8 @@ $("nowS").textContent=TRACKS.length+" bài · "+Object.keys(CATS).length+" thể
 
 // ===== Chuyển mục =====
 function show(v){document.querySelectorAll("#nav button").forEach(b=>b.classList.toggle("on",b.dataset.v===v));
- ["listen","preg","voice","story","diary"].forEach(k=>$("v-"+k).hidden=k!==v);$("listenHead").hidden=v!=="listen";
- if(v==="diary")renderDiary();if(v==="voice")renderRecs();if(v==="preg")renderPreg();scrollTo(0,0)}
+ ["listen","preg","voice","story","diary","baby"].forEach(k=>$("v-"+k).hidden=k!==v);$("listenHead").hidden=v!=="listen";
+ if(v==="diary")renderDiary();if(v==="baby")renderBaby();if(v==="voice")renderRecs();if(v==="preg")renderPreg();scrollTo(0,0)}
 $("nav").onclick=e=>{const v=e.target.closest("button")?.dataset.v;if(v)show(v)};
 
 // ===== Thai kỳ =====
@@ -466,8 +581,9 @@ $("due").onchange=()=>{store.set("due",$("due").value);renderPreg();greet()};
 function pregWeek(){const v=store.get("due","");if(!v)return null;const due=new Date(v+"T00:00:00"),today=new Date(dayKey(Date.now())+"T00:00:00");
  const left=Math.round((due-today)/DAY),days=280-left;return {left,w:Math.floor(days/7),d:days%7}}
 function renderPreg(){const p=pregWeek(),el=$("pregCard");if(!p){el.innerHTML='<p class="muted">Nhập ngày dự sinh để xem bé đang lớn thế nào và nhận gợi ý nhạc theo từng giai đoạn.</p>';return}
- if(p.left<0){el.innerHTML=`<h3>🎉 Chúc mừng mẹ đã gặp con!</h3><p class="muted">Đã qua ngày dự sinh ${-p.left} ngày. Mục <b>👶 Sau sinh</b> có tiếng ồn trắng, tiếng suỵt và âm thanh trong bụng mẹ giúp bé dễ ngủ.</p><button class="btn" id="pgo">Mở nhạc sau sinh</button>`;
-  $("pgo").onclick=()=>{catSel="baby";pl=null;show("listen");render()};return}
+ if(p.left<0){el.innerHTML=`<h3>🎉 Chúc mừng mẹ đã gặp con!</h3><p class="muted">Đã qua ngày dự sinh ${-p.left} ngày. Mục <b>👶 Sau sinh</b> có tiếng ồn trắng, tiếng suỵt và âm thanh trong bụng mẹ giúp bé dễ ngủ.</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="pgo">Mở nhạc sau sinh</button><button class="btn ghost" id="pbaby">👶 Hướng dẫn nuôi bé</button></div>`;
+  $("pgo").onclick=()=>{catSel="baby";pl=null;show("listen");render()};
+  $("pbaby").onclick=()=>{if(!store.get("birth","")){store.set("birth",store.get("due",""));$("birth").value=store.get("due","")}show("baby")};return}
  if(p.w<1||p.left>280){el.innerHTML='<p class="muted">Ngày dự sinh có vẻ chưa đúng, mẹ kiểm tra lại giúp nhé.</p>';return}
  const st=STAGES.find(s=>p.w>=s[0]&&p.w<=s[1])||STAGES[4],size=SIZES[Math.min(40,Math.max(4,p.w))];
  el.innerHTML=`<div class="week"><div class="num">${p.w}</div><div><b>tuần ${p.d?"+ "+p.d+" ngày":""}</b><div class="muted">Còn ${p.left} ngày nữa gặp con</div></div></div>
@@ -543,6 +659,20 @@ function renderDiary(){const k=dayKey(Date.now());
  const hist=Object.entries(log).filter(([d,v])=>v.note&&d!==k).sort((a,b)=>a[0]<b[0]?1:-1).slice(0,30);
  $("dHist").innerHTML=hist.length?hist.map(([d,v])=>`<p style="margin:6px 0"><b>${d.split("-").reverse().join("/")}</b> · ${Math.floor(v.s/60)} phút<br>${v.note.replace(/</g,"&lt;")}</p>`).join(""):"Chưa có ghi chú."}
 let noteT;$("dNote").oninput=()=>{clearTimeout(noteT);noteT=setTimeout(()=>{const k=dayKey(Date.now());log[k]=log[k]||{s:0};log[k].note=$("dNote").value;store.set("log",log);$("dSaved").textContent="Đã lưu ✓"},600)};
+
+// ===== Nuôi bé =====
+function babyAge(){const v=store.get("birth","");if(!v)return null;return Math.round((new Date(dayKey(Date.now())+"T00:00:00")-new Date(v+"T00:00:00"))/DAY)}
+function ageText(d){if(d<7)return d+" ngày tuổi";if(d<56)return Math.floor(d/7)+" tuần "+(d%7?d%7+" ngày ":"")+"tuổi";
+ const b=new Date(store.get("birth")+"T00:00:00"),n=new Date();let m=(n.getFullYear()-b.getFullYear())*12+n.getMonth()-b.getMonth();if(n.getDate()<b.getDate())m--;return m<24?m+" tháng tuổi":Math.floor(m/12)+" tuổi "+(m%12?m%12+" tháng":"")}
+$("birth").value=store.get("birth","");
+$("birth").onchange=()=>{store.set("birth",$("birth").value);renderBaby()};
+function renderBaby(){const d=babyAge();let ci=-1;
+ if(d===null)$("ageMsg").textContent="Nhập ngày sinh để ứng dụng mở đúng giai đoạn của bé. Chưa sinh thì mẹ cứ xem trước để chuẩn bị nhé.";
+ else if(d<0)$("ageMsg").textContent="Ngày sinh đang ở tương lai. Mẹ kiểm tra lại giúp nhé.";
+ else{ci=BABY.findIndex(s=>d>=s.from&&d<=s.to);if(ci<0)ci=BABY.length-1;$("ageMsg").innerHTML=`Bé đã <b>${ageText(d)}</b>. Giai đoạn hiện tại được mở sẵn bên dưới.`}
+ $("stages").innerHTML=BABY.map((s,i)=>`<details class="card stage ${i===ci?"cur":""}" ${i===ci?"open":""}><summary><div style="flex:1"><b>${s.n}</b><div class="age">${s.age}</div></div>${i===ci?'<span class="now">Bé đang ở đây</span>':""}</summary><div class="body">
+  ${Object.keys(H).filter(k=>s[k]).map(k=>`<h4>${H[k]}</h4><ul>${s[k].map(x=>`<li>${x}</li>`).join("")}</ul>`).join("")}
+  ${FLAGS[i]?`<h4 style="color:var(--danger)">⚠️ Nên hỏi bác sĩ nếu</h4><ul><li>${FLAGS[i]}</li></ul>`:""}</div></details>`).join("")}
 
 greet();render();
 </script>
