@@ -17,6 +17,7 @@
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1d181d;--card:#28212a;--ink:#f2e7ec;--muted:#a594a1;--accent:#ec8fab;--accent-soft:#40283a;--line:#372d38;--sage:#97c2a6;--danger:#f08a9a;color-scheme:dark}}
 :root[data-theme="dark"]{--bg:#1d181d;--card:#28212a;--ink:#f2e7ec;--muted:#a594a1;--accent:#ec8fab;--accent-soft:#40283a;--line:#372d38;--sage:#97c2a6;--danger:#f08a9a;color-scheme:dark}
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.4 var(--f);padding-bottom:150px}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -115,6 +116,19 @@ textarea.field{width:100%;min-height:70px;resize:vertical}
 .stage .body{padding:0 14px 12px}
 .stage h4{margin:10px 0 2px;font-size:14px;color:var(--accent)}
 .stage.cur{border-color:var(--accent)}
+.vgrp{display:flex;gap:12px;padding:10px 0;border-top:1px solid var(--line)}
+.vgrp:first-child{border-top:0}
+.vage{width:78px;flex:none;font-weight:500;font-size:13.5px}
+.vage small{display:block;color:var(--muted);font-weight:400;font-size:11.5px;font-variant-numeric:tabular-nums}
+.vgrp.next .vage{color:var(--accent)}
+.vitems{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.vit{display:flex;gap:8px;align-items:flex-start;font-size:14px;line-height:1.4;cursor:pointer}
+.vit input{margin-top:3px;accent-color:var(--accent);flex:none}
+.vit.done span{color:var(--muted);text-decoration:line-through}
+.vit em{font-style:normal;font-size:12px;color:var(--muted);display:block}
+.vtag{font-size:11px;padding:1px 6px;border-radius:6px;margin-left:4px;white-space:nowrap}
+.vtag.late{background:var(--danger);color:#fff}
+.vtag.soon{background:var(--accent-soft);color:var(--accent)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <header><div class="wrap">
@@ -218,6 +232,13 @@ textarea.field{width:100%;min-height:70px;resize:vertical}
    <li>Ít tã ướt (dưới 6 tã/ngày sau tuần đầu), phân có máu hoặc trắng bạc màu.</li>
   </ul>
   <p class="muted" style="margin:6px 0 0">Theo hướng dẫn chăm sóc trẻ bệnh của WHO và AAP. Gọi cấp cứu <b>115</b> khi bé khó thở hoặc co giật.</p>
+ </div>
+ <div class="card">
+  <h3>💉 Lịch tiêm các mũi quan trọng</h3>
+  <p class="muted" id="vaxSum" style="margin:0 0 6px"></p>
+  <div class="chips" id="vaxTabs" style="padding-top:2px"><button class="chip on" data-t="free">Tiêm chủng mở rộng (miễn phí)</button><button class="chip" data-t="paid">Nên tiêm thêm (dịch vụ)</button></div>
+  <div id="vaxList"></div>
+  <p class="muted" style="margin:8px 0 0">Bấm ô vuông để đánh dấu mũi đã tiêm (lưu trên máy này). Lịch theo Chương trình Tiêm chủng mở rộng của Bộ Y tế; thời gian có thể khác theo địa phương, bố mẹ hãy mang sổ tiêm chủng và hỏi trạm y tế. Vắc-xin dịch vụ cần bác sĩ tư vấn trước khi tiêm.</p>
  </div>
  <div class="sec-t">Lộ trình theo tuổi của bé · bấm từng giai đoạn để xem</div>
  <div id="stages"></div>
@@ -429,6 +450,27 @@ const BABY=[
   vac:["Kiểm tra sổ tiêm chủng, bổ sung các mũi còn thiếu."],
   play:["Chơi đóng vai, xếp hình, tô màu.","Hát và vận động theo nhạc; kể chuyện trước giờ ngủ."]}
 ];
+// Lịch tiêm theo mốc tuổi. d = ngày tuổi dự kiến (để tính ngày hẹn), id dùng để lưu đánh dấu.
+const VAX={
+ free:[
+  {age:"Sơ sinh",d:0,v:[["hepb0","Viêm gan B sơ sinh","Trong vòng 24 giờ đầu sau sinh"],["bcg","Lao (BCG)","Càng sớm càng tốt, trong tháng đầu"]]},
+  {age:"2 tháng",d:61,v:[["dpt1","5 trong 1 mũi 1","Bạch hầu, ho gà, uốn ván, viêm gan B, viêm phổi/màng não do Hib"],["opv1","Bại liệt uống (bOPV) lần 1",""],["rota1","Rota liều 1 (uống)","Phòng tiêu chảy do virus Rota; đang triển khai miễn phí dần theo tỉnh"]]},
+  {age:"3 tháng",d:91,v:[["dpt2","5 trong 1 mũi 2",""],["opv2","Bại liệt uống lần 2",""],["rota2","Rota liều 2 (uống)","Cách liều 1 ít nhất 1 tháng"]]},
+  {age:"4 tháng",d:122,v:[["dpt3","5 trong 1 mũi 3",""],["opv3","Bại liệt uống lần 3",""]]},
+  {age:"5 tháng",d:152,v:[["ipv1","Bại liệt tiêm (IPV) mũi 1",""]]},
+  {age:"9 tháng",d:274,v:[["mea1","Sởi mũi 1",""],["ipv2","Bại liệt tiêm (IPV) mũi 2",""]]},
+  {age:"12 tháng",d:365,v:[["je1","Viêm não Nhật Bản mũi 1",""],["je2","Viêm não Nhật Bản mũi 2","1–2 tuần sau mũi 1"]]},
+  {age:"18 tháng",d:548,v:[["dpt4","Bạch hầu – ho gà – uốn ván (DPT) nhắc lại",""],["mr","Sởi – Rubella (MR)",""]]},
+  {age:"2 tuổi",d:730,v:[["je3","Viêm não Nhật Bản mũi 3","1 năm sau mũi 2"]]}
+ ],
+ paid:[
+  {age:"Từ 6 tuần",d:42,v:[["pcv","Phế cầu","Phòng viêm phổi, viêm màng não, viêm tai giữa; 3–4 mũi tùy loại"],["hexa","6 trong 1 (thay cho 5 trong 1 + bại liệt)","Nếu bố mẹ chọn tiêm dịch vụ"]]},
+  {age:"Từ 2–3 tháng",d:75,v:[["menb","Não mô cầu nhóm B","Phòng viêm màng não do não mô cầu"]]},
+  {age:"Từ 6 tháng",d:183,v:[["flu","Cúm","Năm đầu tiêm 2 mũi cách nhau 1 tháng, sau đó nhắc mỗi năm"]]},
+  {age:"Từ 9 tháng",d:274,v:[["menacwy","Não mô cầu ACYW",""],["mmr0","Sởi – quai bị – rubella (MMR) hoặc sởi – rubella","Có thể tiêm sớm khi có dịch, theo tư vấn bác sĩ"]]},
+  {age:"Từ 12 tháng",d:365,v:[["vari","Thủy đậu",""],["hepa","Viêm gan A",""],["mmr","Sởi – quai bị – rubella (MMR)",""]]}
+ ]};
+let vaxTab="free",vaxDone;
 // Dấu hiệu nên hỏi bác sĩ sớm theo từng giai đoạn (CDC – Learn the Signs. Act Early.)
 const FLAGS={2:"Đến khoảng 2 tháng mà bé chưa mỉm cười với người, không phản ứng với tiếng động lớn.",3:"Đến 4 tháng mà bé chưa giữ được đầu, không nhìn theo đồ vật.",4:"Đến 6 tháng bé chưa với lấy đồ vật, không cười thành tiếng, người quá mềm hoặc quá cứng.",5:"Đến 9 tháng bé chưa ngồi được khi có người giúp, không phản ứng khi được gọi tên.",6:"Đến 12 tháng bé chưa bò, không chỉ tay, không nói được từ nào, mất kỹ năng đã có.",7:"Đến 18 tháng bé chưa tự đi, không nói được vài từ, không bắt chước người khác.",8:"Đến 2 tuổi bé chưa nói câu 2 từ, không làm theo yêu cầu đơn giản, mất kỹ năng đã có."};
 
@@ -436,6 +478,7 @@ let ctx,master,cur=null,stopFns=[],timers=[],catSel="all",endAt=0,audioEl=null,a
 const MODES=[["next","➡️ Phát tiếp"],["one","🔂 Lặp 1 bài"],["shuffle","🔀 Ngẫu nhiên"]];
 const store={get(k,d){try{return JSON.parse(localStorage.getItem("mybaby-"+k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem("mybaby-"+k,JSON.stringify(v))}catch(e){}}};
 let favs=new Set(store.get("favs",[])),mode=store.get("mode","next");
+vaxDone=new Set(store.get("vax",[]));
 TRACKS.forEach((t,i)=>t.id=t.g.src||t.c+"-"+i);
 const $=id=>document.getElementById(id);
 const mtof=m=>440*Math.pow(2,(m-69)/12);
@@ -666,7 +709,17 @@ function ageText(d){if(d<7)return d+" ngày tuổi";if(d<56)return Math.floor(d/
  const b=new Date(store.get("birth")+"T00:00:00"),n=new Date();let m=(n.getFullYear()-b.getFullYear())*12+n.getMonth()-b.getMonth();if(n.getDate()<b.getDate())m--;return m<24?m+" tháng tuổi":Math.floor(m/12)+" tuổi "+(m%12?m%12+" tháng":"")}
 $("birth").value=store.get("birth","");
 $("birth").onchange=()=>{store.set("birth",$("birth").value);renderBaby()};
-function renderBaby(){const d=babyAge();let ci=-1;
+function renderVax(){const age=babyAge(),born=age!==null&&age>=0,b=born?new Date(store.get("birth")+"T00:00:00"):null;
+ const all=VAX.free.flatMap(g=>g.v.map(x=>x[0])),done=all.filter(id=>vaxDone.has(id)).length;
+ const nextG=born?VAX[vaxTab].find(g=>g.v.some(x=>!vaxDone.has(x[0]))):null;
+ $("vaxSum").innerHTML=`Đã tiêm <b>${done}/${all.length}</b> mũi trong chương trình miễn phí.`+(born&&nextG&&vaxTab==="free"?` Mốc tiếp theo: <b>${nextG.age}</b>${nextG.d>age?" – khoảng "+new Date(b.getTime()+nextG.d*DAY).toLocaleDateString("vi-VN"):""}.`:"")+(born?"":" Nhập ngày sinh ở trên để xem ngày hẹn tiêm của bé.");
+ document.querySelectorAll("#vaxTabs .chip").forEach(c=>c.classList.toggle("on",c.dataset.t===vaxTab));
+ $("vaxList").innerHTML=VAX[vaxTab].map(g=>{const date=born?new Date(b.getTime()+g.d*DAY).toLocaleDateString("vi-VN"):"",open=g.v.some(x=>!vaxDone.has(x[0]));
+  const tag=!born||!open?"":age>g.d+30&&vaxTab==="free"?'<span class="vtag late">Trễ lịch</span>':g.d-age<=14&&g.d-age>=-30?'<span class="vtag soon">Sắp tới</span>':"";
+  return `<div class="vgrp ${g===nextG?"next":""}"><div class="vage">${g.age}<small>${date}</small></div><div class="vitems">${g.v.map(([id,n,note],k)=>`<label class="vit ${vaxDone.has(id)?"done":""}"><input type="checkbox" data-id="${id}" ${vaxDone.has(id)?"checked":""}><span>${n}${k===0?tag:""}${note?`<em>${note}</em>`:""}</span></label>`).join("")}</div></div>`}).join("")}
+$("vaxTabs").onclick=e=>{const t=e.target.closest(".chip")?.dataset.t;if(t){vaxTab=t;renderVax()}};
+$("vaxList").onchange=e=>{const id=e.target.dataset.id;if(!id)return;e.target.checked?vaxDone.add(id):vaxDone.delete(id);store.set("vax",[...vaxDone]);renderVax()};
+function renderBaby(){renderVax();const d=babyAge();let ci=-1;
  if(d===null)$("ageMsg").textContent="Nhập ngày sinh để ứng dụng mở đúng giai đoạn của bé. Chưa sinh thì mẹ cứ xem trước để chuẩn bị nhé.";
  else if(d<0)$("ageMsg").textContent="Ngày sinh đang ở tương lai. Mẹ kiểm tra lại giúp nhé.";
  else{ci=BABY.findIndex(s=>d>=s.from&&d<=s.to);if(ci<0)ci=BABY.length-1;$("ageMsg").innerHTML=`Bé đã <b>${ageText(d)}</b>. Giai đoạn hiện tại được mở sẵn bên dưới.`}
