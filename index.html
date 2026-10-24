@@ -129,6 +129,15 @@ textarea.field{width:100%;min-height:70px;resize:vertical}
 .vtag{font-size:11px;padding:1px 6px;border-radius:6px;margin-left:4px;white-space:nowrap}
 .vtag.late{background:var(--danger);color:#fff}
 .vtag.soon{background:var(--accent-soft);color:var(--accent)}
+.sos,.metro{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.sos .btn{background:var(--danger);text-decoration:none}
+.metro{margin-top:10px}
+.aid{border-top:1px solid var(--line);padding:2px 0}
+.aid summary{padding:10px 0;font-weight:500;cursor:pointer}
+.aid ol,.aid ul{margin:2px 0 8px;padding-left:20px;font-size:14px}
+.aid li{margin:4px 0;line-height:1.5}
+.aid .who{font-size:12.5px;color:var(--accent);font-weight:500;margin-top:6px}
+.aid .no{color:var(--danger);font-size:12.5px;font-weight:500}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 <header><div class="wrap">
@@ -232,6 +241,14 @@ textarea.field{width:100%;min-height:70px;resize:vertical}
    <li>Ít tã ướt (dưới 6 tã/ngày sau tuần đầu), phân có máu hoặc trắng bạc màu.</li>
   </ul>
   <p class="muted" style="margin:6px 0 0">Theo hướng dẫn chăm sóc trẻ bệnh của WHO và AAP. Gọi cấp cứu <b>115</b> khi bé khó thở hoặc co giật.</p>
+ </div>
+ <div class="card">
+  <h3>🆘 Sơ cứu khẩn cấp cho trẻ</h3>
+  <div class="sos"><a class="btn" href="tel:115">📞 Gọi cấp cứu 115</a><span class="muted">Cứu hỏa, cứu nạn: <b>114</b> · Công an: <b>113</b></span></div>
+  <p class="muted" style="margin:8px 0 4px">Bình tĩnh, gọi 115 sớm (bật loa ngoài để vừa nghe hướng dẫn vừa sơ cứu). Bấm từng tình huống để xem các bước.</p>
+  <div id="aid"></div>
+  <div class="metro"><button class="btn ghost" id="metro">🔔 Bật nhịp ép tim (110 lần/phút)</button><span class="muted">Ép theo mỗi tiếng bíp; tiếng bíp cao báo đủ 30 lần ép, đến lượt thổi 2 hơi.</span></div>
+  <p class="muted" style="margin:8px 0 0">Tổng hợp từ hướng dẫn của Hội Tim mạch Hoa Kỳ (AHA), Hội Chữ thập đỏ, WHO và AAP. Đọc trước không thay được thực hành: bố mẹ nên học một khóa sơ cứu có hướng dẫn trực tiếp (Hội Chữ thập đỏ, bệnh viện nhi thường tổ chức).</p>
  </div>
  <div class="card">
   <h3>💉 Lịch tiêm các mũi quan trọng</h3>
@@ -449,6 +466,44 @@ const BABY=[
   care:["Có thể bắt đầu tập đi bô khi bé sẵn sàng: biết báo, giữ tã khô được 2 tiếng.","Thời gian xem màn hình nếu có thì dưới 1 giờ/ngày, có bố mẹ xem cùng."],
   vac:["Kiểm tra sổ tiêm chủng, bổ sung các mũi còn thiếu."],
   play:["Chơi đóng vai, xếp hình, tô màu.","Hát và vận động theo nhạc; kể chuyện trước giờ ngủ."]}
+];
+// Sơ cứu khẩn cấp (AHA, Hội Chữ thập đỏ, WHO, AAP). parts: [nhãn, các bước có thứ tự?, danh sách]
+const AID=[
+ {t:"😮‍💨 Hóc dị vật, nghẹn thở",parts:[
+  ["Nhận biết",0,["Bé đột ngột không khóc, không ho, không thở được hoặc thở rít, mặt tím tái.","Nếu bé còn ho mạnh, khóc được: để bé tự ho, theo dõi sát, không vỗ lưng, không móc họng."]],
+  ["Bé dưới 1 tuổi",1,["Đặt bé nằm sấp dọc trên cẳng tay, đầu thấp hơn ngực, tay đỡ cằm và hàm (không bóp cổ).","Dùng gót bàn tay vỗ mạnh <b>5 cái</b> vào giữa hai bả vai.","Lật bé nằm ngửa trên cẳng tay kia, đầu vẫn thấp. Dùng 2 ngón tay ấn mạnh <b>5 cái</b> vào giữa ngực, ngay dưới đường nối hai núm vú.","Nhìn vào miệng: chỉ lấy dị vật khi <b>nhìn thấy rõ</b>.","Lặp lại 5 vỗ lưng – 5 ấn ngực cho đến khi dị vật ra hoặc bé bất tỉnh. Nhờ người gọi 115 ngay."]],
+  ["Trẻ từ 1 tuổi",1,["Đứng hoặc quỳ sau lưng trẻ, vòng tay ôm ngang bụng.","Đặt nắm tay ngay trên rốn, dưới xương ức; tay kia ôm lấy nắm tay.","Giật mạnh hướng vào trong và lên trên (thủ thuật Heimlich) cho đến khi dị vật ra."]],
+  ["Nếu bé bất tỉnh",0,["Gọi 115 và bắt đầu hồi sức tim phổi ngay (xem mục bên dưới). Mỗi lần thổi ngạt, nhìn vào miệng xem có dị vật không."]],
+  ["Không được",2,["Không móc họng mò mẫm khi không nhìn thấy dị vật, vì có thể đẩy dị vật vào sâu hơn.","Không dốc ngược chân bé lắc mạnh."]]]},
+ {t:"❤️ Hồi sức tim phổi (bé không thở, không phản ứng)",parts:[
+  ["Kiểm tra",1,["Vỗ vào lòng bàn chân, gọi to. Nếu bé không phản ứng và không thở hoặc chỉ thở ngáp: gọi to nhờ người gọi 115.","Nếu chỉ có một mình: làm hồi sức <b>2 phút</b> trước rồi mới gọi 115 (bật loa ngoài).","Đặt bé nằm ngửa trên mặt phẳng cứng."]],
+  ["Bé dưới 1 tuổi",1,["Ép tim: 2 ngón tay đặt giữa ngực, ngay dưới đường nối hai núm vú. Ép sâu khoảng <b>4 cm</b> (1/3 bề dày ngực), nhanh <b>100–120 lần/phút</b>, để ngực nảy lên hết sau mỗi lần ép.","Sau <b>30 lần ép</b>: hơi ngửa đầu, nâng cằm, áp miệng mình trùm cả <b>miệng và mũi</b> bé, thổi nhẹ <b>2 hơi</b>, mỗi hơi khoảng 1 giây, thấy ngực phồng lên là đủ.","Lặp lại 30 ép – 2 thổi (nếu có 2 người: 15 ép – 2 thổi) cho đến khi bé tự thở hoặc nhân viên y tế tới."]],
+  ["Trẻ từ 1 tuổi",1,["Dùng gót một bàn tay (hoặc hai tay với trẻ lớn) đặt giữa ngực, ép sâu khoảng <b>5 cm</b>, 100–120 lần/phút.","Thổi ngạt qua miệng (bịt mũi trẻ). Tỉ lệ 30 ép – 2 thổi như trên."]],
+  ["Lưu ý",0,["Nếu không thể hoặc không quen thổi ngạt, hãy chỉ ép tim liên tục, vẫn tốt hơn không làm gì.","Dùng nút “Bật nhịp ép tim” bên dưới để ép đúng nhịp."]]]},
+ {t:"🌡️ Co giật do sốt",parts:[
+  ["Cần làm",1,["Đặt bé nằm nghiêng trên mặt phẳng an toàn, dẹp đồ vật cứng, sắc xung quanh.","Nới lỏng quần áo, xem giờ để biết cơn giật kéo dài bao lâu.","Ở bên bé đến khi hết cơn; sau cơn bé thường mệt, ngủ li bì một lúc.","Gọi 115 nếu cơn giật trên <b>5 phút</b>, bé khó thở, tím tái, hoặc là cơn giật đầu tiên. Luôn cho bé đi khám sau cơn giật."]],
+  ["Không được",2,["Không cạy miệng, nhét đũa, khăn, ngón tay vào miệng bé.","Không giữ chặt tay chân, không cho uống thuốc hay nước khi đang giật.","Không chườm đá lạnh, không ngâm bé vào nước."]]]},
+ {t:"🔥 Bỏng",parts:[
+  ["Cần làm",1,["Đưa bé ra khỏi nguồn nhiệt. Cởi quần áo, trang sức ở vùng bỏng nếu không dính vào da.","Xả <b>nước mát (không lạnh buốt)</b> lên vết bỏng liên tục khoảng <b>20 phút</b>. Giữ ấm phần cơ thể còn lại.","Che vết bỏng bằng màng bọc thực phẩm hoặc gạc sạch, không quấn chặt.","Đưa đi viện nếu vết bỏng rộng hơn bàn tay bé, phồng rộp, ở mặt, tay, bộ phận sinh dục, hoặc bỏng do điện, hóa chất."]],
+  ["Không được",2,["Không chườm đá, không bôi kem đánh răng, nước mắm, dầu ăn, mỡ trăn.","Không chọc vỡ bọng nước."]]]},
+ {t:"🌊 Đuối nước",parts:[
+  ["Cần làm",1,["Đưa bé lên khỏi nước an toàn, gọi 115.","Nếu bé không thở: làm hồi sức tim phổi ngay, bắt đầu bằng thổi ngạt.","Nếu bé thở lại: đặt nằm nghiêng, giữ ấm, vẫn đưa đi viện để theo dõi."]],
+  ["Không được",2,["Không dốc ngược, xốc nước hay chạy vòng quanh. Mất thời gian quý giá và không giúp lấy nước ra."]]]},
+ {t:"🧪 Uống nhầm thuốc, hóa chất",parts:[
+  ["Cần làm",1,["Lấy phần còn lại ra khỏi miệng bé, giữ lại vỏ chai, hộp thuốc.","Gọi 115 hoặc đưa bé đến cơ sở y tế gần nhất, mang theo vỏ chai, hộp thuốc."]],
+  ["Không được",2,["Không tự gây nôn, không cho uống sữa, nước muối hay than khi chưa có chỉ dẫn của nhân viên y tế."]]]},
+ {t:"🤕 Ngã, va đập đầu",parts:[
+  ["Cần làm",1,["Dỗ bé, chườm lạnh (bọc khăn) chỗ sưng 10–15 phút.","Theo dõi bé sát trong 24 giờ.","Đưa đi viện ngay nếu bé bất tỉnh dù trong thời gian ngắn, nôn nhiều lần, li bì, co giật, chảy máu hoặc dịch trong ở tai, mũi, thóp phồng, hay bé dưới 1 tuổi ngã từ trên cao."]],
+  ["Không được",2,["Không lay mạnh bé. Nếu nghi chấn thương cổ, cột sống thì không di chuyển bé, gọi 115."]]]},
+ {t:"🩸 Chảy máu, chảy máu cam",parts:[
+  ["Vết thương chảy máu",1,["Dùng gạc hoặc khăn sạch ấn chặt trực tiếp lên vết thương vài phút đến khi máu ngừng.","Máu thấm qua thì đặt thêm gạc lên trên, tiếp tục ấn. Gọi 115 nếu máu phun thành tia hoặc không cầm được."]],
+  ["Chảy máu cam",1,["Cho bé ngồi, <b>cúi đầu hơi ra trước</b>.","Bóp chặt phần mềm của mũi trong 10 phút, bé thở bằng miệng.","Đi khám nếu chảy trên 20 phút hoặc sau va đập mạnh."]],
+  ["Không được",2,["Không ngửa đầu ra sau, vì máu chảy xuống họng gây sặc, nôn."]]]},
+ {t:"⚡ Điện giật",parts:[
+  ["Cần làm",1,["Ngắt cầu dao, rút phích điện trước. Nếu không ngắt được, dùng vật khô không dẫn điện (gậy gỗ, nhựa) gạt nguồn điện ra.","Gọi 115. Nếu bé không thở, làm hồi sức tim phổi."]],
+  ["Không được",2,["Không chạm tay trực tiếp vào bé khi bé còn tiếp xúc với nguồn điện."]]]},
+ {t:"🐝 Dị ứng nặng, côn trùng đốt",parts:[
+  ["Cần làm",1,["Gọi 115 ngay nếu bé sưng môi, mặt, lưỡi, khó thở, thở rít, nổi mề đay khắp người, nôn, lả đi.","Đặt bé nằm (hoặc ngồi nếu khó thở). Nếu bé đã được bác sĩ kê bút tiêm adrenaline, dùng ngay theo hướng dẫn.","Vết ong đốt thông thường: lấy ngòi ra bằng cách gạt ngang, rửa sạch, chườm lạnh."]]]}
 ];
 // Lịch tiêm theo mốc tuổi. d = ngày tuổi dự kiến (để tính ngày hẹn), id dùng để lưu đánh dấu.
 const VAX={
@@ -719,6 +774,12 @@ function renderVax(){const age=babyAge(),born=age!==null&&age>=0,b=born?new Date
   return `<div class="vgrp ${g===nextG?"next":""}"><div class="vage">${g.age}<small>${date}</small></div><div class="vitems">${g.v.map(([id,n,note],k)=>`<label class="vit ${vaxDone.has(id)?"done":""}"><input type="checkbox" data-id="${id}" ${vaxDone.has(id)?"checked":""}><span>${n}${k===0?tag:""}${note?`<em>${note}</em>`:""}</span></label>`).join("")}</div></div>`}).join("")}
 $("vaxTabs").onclick=e=>{const t=e.target.closest(".chip")?.dataset.t;if(t){vaxTab=t;renderVax()}};
 $("vaxList").onchange=e=>{const id=e.target.dataset.id;if(!id)return;e.target.checked?vaxDone.add(id):vaxDone.delete(id);store.set("vax",[...vaxDone]);renderVax()};
+$("aid").innerHTML=AID.map(a=>`<details class="aid"><summary>${a.t}</summary>${a.parts.map(([l,kind,items])=>`<div class="${kind===2?"no":"who"}">${kind===2?"⛔ ":""}${l}</div><${kind===1?"ol":"ul"}>${items.map(x=>`<li>${x}</li>`).join("")}</${kind===1?"ol":"ul"}>`).join("")}</details>`).join("");
+// Nhịp ép tim 110 lần/phút bằng tiếng bíp
+let metroT=null;
+$("metro").onclick=()=>{if(metroT){clearInterval(metroT);metroT=null;$("metro").textContent="🔔 Bật nhịp ép tim (110 lần/phút)";return}
+ init();ctx.resume();let n=0;const beep=()=>{const t=ctx.currentTime;n++;tone(n%30===0?1320:880,t,.08,{type:"square",vol:.25,att:.003,dest:master})};
+ beep();metroT=setInterval(beep,60000/110);$("metro").textContent="⏹ Tắt nhịp ép tim"};
 function renderBaby(){renderVax();const d=babyAge();let ci=-1;
  if(d===null)$("ageMsg").textContent="Nhập ngày sinh để ứng dụng mở đúng giai đoạn của bé. Chưa sinh thì mẹ cứ xem trước để chuẩn bị nhé.";
  else if(d<0)$("ageMsg").textContent="Ngày sinh đang ở tương lai. Mẹ kiểm tra lại giúp nhé.";
